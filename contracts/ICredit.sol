@@ -1,7 +1,5 @@
 pragma solidity ^0.5.0;
 
-import "./IMetadata.sol";
-
 interface ICredit {
     
     event Transfer(address indexed _sender, address indexed _from, address indexed _to, uint256 _id, uint256 _value);
@@ -62,7 +60,7 @@ interface ICredit {
         @param _ids      List of ID of the credit types
         @param _values   List of Transfer amounts
     */
-    function safeFullBatchTransfer(address[] calldata _from, address[] calldata _to, uint256[] calldata _ids, uint256[]
+    function safeFullBatchTransfer(address[] calldata _froms, address[] calldata _tos, uint256[] calldata _ids, uint256[]
                                    calldata _values) external;
 
     /**
@@ -93,8 +91,14 @@ interface ICredit {
         Create a new credit type.
         @dev the caller is force to be the credit creator. The initTotalSupply of the credit will be send to the caller.
         @param _initTotalSupply     started balance of the credit
+        @param _name                Credit name
+        @param _code                Credit code or symbol usaully 3-12 Chars e.g., USD
+        @param _issuer              Credit issuer which could be a domain, entity, Stelllar Public key, or Evrynet Public key.
+        @param _jsonURL             Credit detail from a REST(GET) API returns JSON
+        @param _decimals            Credit decimals
     */
-    function create(uint256 _initTotalSupply) external;
+    function create(uint256 _initTotalSupply, string calldata _name, string calldata _code, string calldata _issuer,
+                    string calldata _jsonURL, uint16 _decimals) external;
 
     /**
         Generate `_value` of Credit `_id` and transfer to a given `_to`.
@@ -132,4 +136,3 @@ interface ICredit {
      */
     function totalSupply(uint256 _id) view external returns(uint256);
 }
-

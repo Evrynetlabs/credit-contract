@@ -28,8 +28,8 @@ contract Credit is ICredit, Metadata {
 
     function _transfer(address _sender, address _from, address _to, uint256 _id, uint256 _value) internal {
         require(_id <= currentID, "Credit: invalid credit ID.");
-        require(eachApproved[_from][_sender][_id] || allApproved[_from][_sender] || _sender == _from,
-                "Credit: sender is not allowed to transfer.");
+        require(eachApproved[_from][_sender][_id] || allApproved[_from][_sender] || _sender == _from, 
+        "Credit: sender is not allowed to transfer.");
         require(balances[_from][_id] >= _value, "Credit: insuffient fund.");
         require(_from != address(0) && _to != address(0), "Credit: address zero is not allowed.");
 
@@ -107,8 +107,7 @@ contract Credit is ICredit, Metadata {
     */
     function safeFullBatchTransfer(address[] calldata _froms, address[] calldata _tos, uint256[] calldata _ids,
                                    uint256[] calldata _values) external {
-        require(_froms.length.sub(_tos.length).add(_ids.length).sub(_values.length) == 0, 
-                "Credit: the number of id and value MUST be eqaul.");
+        require(_froms.length.sub(_tos.length).add(_ids.length).sub(_values.length) == 0, "Credit: the number of id and value MUST be eqaul.");
 
         for( uint256 i = 0; i < _froms.length; ++i) {
             _transfer(msg.sender, _froms[i], _tos[i], _ids[i], _values[i]);
@@ -165,13 +164,12 @@ contract Credit is ICredit, Metadata {
         @param _jsonURL             Credit detail from a REST(GET) API returns JSON
         @param _decimals            Credit decimals
     */
-    function create(uint256 _initTotalSupply, string calldata _name, string calldata _code, string calldata _issuer,
-                    string calldata _jsonURL, uint16 _decimals) external {
+    function create(uint256 _initTotalSupply, string calldata _name, string calldata _code, string calldata _issuer, string calldata _jsonURL, uint16 _decimals) external {
         currentID++;
         totalSupplies[currentID] = _initTotalSupply;
         balances[msg.sender][currentID] = _initTotalSupply;
         creators[currentID] = msg.sender;
-
+        
         register(currentID, _name, _code, _issuer, _jsonURL, _decimals);
 
         emit Create(currentID, msg.sender, _initTotalSupply);
@@ -188,8 +186,8 @@ contract Credit is ICredit, Metadata {
         require(_to != address(0), "Credit: address zero is not allowed.");
         _isCallable(_to, _id);
 
-        balances[_to][_id].add(_value);
-        totalSupplies[_id].add(_value);
+        balances[_to][_id] = balances[_to][_id].add(_value);
+        totalSupplies[_id] = totalSupplies[_id].add(_value);
 
         emit Transfer(msg.sender, address(0), _to, _id, _value);
     }
@@ -234,5 +232,9 @@ contract Credit is ICredit, Metadata {
      */
     function totalSupply(uint256 _id) view external returns(uint256){
         return totalSupplies[_id];
+    }
+    
+    function getCurrentID() view external returns(uint256) {
+        return currentID;
     }
 }

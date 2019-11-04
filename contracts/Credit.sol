@@ -4,9 +4,10 @@ import "./ICredit.sol";
 import "./IReceiver.sol";
 import "./SafeMath.sol";
 import "./Address.sol";
+import "./Metadata.sol";
 
 
-contract Credit is ICredit {
+contract Credit is ICredit, Metadata {
 
     using SafeMath for uint256;
     using Address for address;
@@ -27,7 +28,8 @@ contract Credit is ICredit {
 
     function _transfer(address _sender, address _from, address _to, uint256 _id, uint256 _value) internal {
         require(_id <= currentID, "Credit: invalid credit ID.");
-        require(eachApproved[_from][_sender][_id] || allApproved[_from][_sender] || _sender == _from, "Credit: sender is not allowed to transfer.");
+        require(eachApproved[_from][_sender][_id] || allApproved[_from][_sender] || _sender == _from,
+                "Credit: sender is not allowed to transfer.");
         require(balances[_from][_id] >= _value, "Credit: insuffient fund.");
         require(_from != address(0) && _to != address(0), "Credit: address zero is not allowed.");
 
@@ -105,7 +107,8 @@ contract Credit is ICredit {
     */
     function safeFullBatchTransfer(address[] calldata _froms, address[] calldata _tos, uint256[] calldata _ids,
                                    uint256[] calldata _values) external {
-        require(_froms.length.sub(_tos.length).add(_ids.length).sub(_values.length) == 0, "Credit: the number of id and value MUST be eqaul.");
+        require(_froms.length.sub(_tos.length).add(_ids.length).sub(_values.length) == 0, 
+                "Credit: the number of id and value MUST be eqaul.");
 
         for( uint256 i = 0; i < _froms.length; ++i) {
             _transfer(msg.sender, _froms[i], _tos[i], _ids[i], _values[i]);
@@ -144,11 +147,11 @@ contract Credit is ICredit {
         @param _id          credit type id which the broker can control
         @return broker status
     */
-    function getApprove(address customer, address _broker, uint256 _id) view external returns(bool) {
-        if(allApproved[customer][_broker] == true) {
+    function getApprove(address _customer, address _broker, uint256 _id) view external returns(bool) {
+        if(allApproved[_customer][_broker] == true) {
             return true;
         } else {
-            return eachApproved[customer][_broker][_id];
+            return eachApproved[_customer][_broker][_id];
         }
     }
 
@@ -156,14 +159,22 @@ contract Credit is ICredit {
         Create a new credit type.
         @dev the caller is force to be the credit creator. The initTotalSupply of the credit will be send to the caller.
         @param _initTotalSupply     started balance of the credit
+        @param _name                Credit name
+        @param _code                Credit code or symbol usaully 3-12 Chars e.g., USD
+        @param _issuer              Credit issuer which could be a domain, entity, Stelllar Public key, or Evrynet Public key.
+        @param _jsonURL             Credit detail from a REST(GET) API returns JSON
+        @param _decimals            Credit decimals
     */
-    function create(uint256 _initTotalSupply) external {
+    function create(uint256 _initTotalSupply, string calldata _name, string calldata _code, string calldata _issuer,
+                    string calldata _jsonURL, uint16 _decimals) external {
         currentID++;
         totalSupplies[currentID] = _initTotalSupply;
         balances[msg.sender][currentID] = _initTotalSupply;
         creators[currentID] = msg.sender;
 
-        emit Create(_id, msg.sender, _initTotalSupply);
+        register(currentID, _name, _code, _issuer, _jsonURL, _decimals);
+
+        emit Create(currentID, msg.sender, _initTotalSupply);
     }
 
     /**

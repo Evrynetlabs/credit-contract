@@ -23,19 +23,6 @@ interface IERC1155E /* is ERC1155MixedFungibleMintable, IERC1155Metadata */ {
     */
     function safeFullBatchTransferFrom(address[] calldata _froms, address[] calldata _tos, uint256[] calldata _ids, uint256[]
                                    calldata _values, bytes calldata _data) external;
-
-    /**
-        Remove `_type` from the world.
-        @param _type  Non-fungible Credit type
-    */
-    function burnNonFungible(uint256 _type) external;
-
-    /**
-        Delete `_value` of Credit `_id` from the world.
-        @param _id  Credit type
-        @param _quantities Burn Credit amount
-    */
-    function burnFungible(uint256 _id, uint256 _quantities) external;
     
     /**
         give `_id` creator authorized to `_minter`.

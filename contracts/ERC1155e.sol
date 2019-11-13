@@ -1,0 +1,117 @@
+pragma solidity ^0.5.0;
+
+import "@openzeppelin/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
+import "./IERC1155e.sol";
+import "./ERC1155MixedFungibleMintable.sol";
+import "./IERC1155MetaData.sol";
+
+
+contract ERC1155E is IERC1155E, ERC1155MixedFungibleMintable, ERC1155Metadata_URI {
+
+    using SafeMath for uint256;
+    using Address for address;
+
+    /**
+        Multiple transfer with [multi-sender] [multi-receiver] and [muti-]credit type.
+        @dev Caller must be approved or be an owner of the credit being transferred.
+        MUST be revert if the `_id` is invalid.
+        MUST be revert if no authorized to transfer.
+        MUST be revert if `_from`'s `_id` balance less than `_value`.
+        MUST be revert if `_from` or `_to` is the zero address.
+        MUST be revert if `_to` is a smart contract but does not implement ERC1155TokenReceiver.
+        MUST be revert if number of `_froms` `_tos` `_ids` and `_values` does not eqaul.
+        MUST emit TransferFullBatch event.
+        @param _froms    List of Source addresses
+        @param _tos      List of Target addresses
+        @param _ids      List of ID of the credit types
+        @param _values   List of Transfer amounts
+    */
+    function safeFullBatchTransferFrom(address[] calldata _froms, address[] calldata _tos, uint256[] calldata _ids,
+                                   uint256[] calldata _values, bytes calldata _data) external {
+        require(_froms.length == _tos.length && _froms.length == _ids.length && _froms.length == _values.length, "Credit: Array length must match");
+
+        for( uint256 i = 0; i < _froms.length; ++i) {
+            // Cache value to local variable to reduce read costs.
+            address from = _froms[i];
+            address to = _tos[i];
+            uint256 id = _ids[i];
+            uint256 value = _values[i];
+
+            require(to != address(0x0), "Credit: cannot send to zero address");
+            require(from == msg.sender || operatorApproval[from][msg.sender] == true, "Credit: Need operator approval for 3rd party transfers.");
+            if (isNonFungible(id)) {
+                require(nfOwners[id] == from);
+                nfOwners[id] = to;
+            } else {
+                balances[id][from] = balances[id][from].sub(value);
+                balances[id][to]   = value.add(balances[id][to]);
+            }
+            if (to.isContract()) {
+                _doSafeTransferAcceptanceCheck(msg.sender, from, to, id, value, _data);
+            }
+        }
+
+        emit TransferFullBatch(msg.sender, _froms, _tos, _ids, _values);
+    }
+
+    /**
+        Delete `_value` of Credit `_id` from the world.
+        @param _id  Credit type
+    */
+    function burnNonFungible(uint256 _id) external {
+        require(isNonFungible(_id), "Credit: asset being burned is not a non-fungible asset");
+        require(ownerOf(_id) == msg.sender, "Credit: not authorized to burn the credit");
+        nfOwners[_id] = address(0);
+
+        emit TransferSingle(msg.sender, msg.sender, address(0), _id, 1);
+    }
+
+    /**
+        Delete `_value` of Credit `_id` from the world.
+        @param _id  Credit type
+        @param _quantities Burn Credit quantities
+    */
+    function burnFungible(uint256 _id, uint256 _quantities) external {
+        require(isFungible(_id));
+        balances[_id][msg.sender].sub(_quantities);
+
+        emit TransferSingle(msg.sender, msg.sender, address(0), _id, _quantities);
+    }
+
+    /**
+        give `_id` creator authorized to `_minter`.
+        @param _type  Credit type
+        @param _minter New minter, in case of address 0 the authorized will be locked forever
+    */
+    function setMinter(uint256 _type, address _minter) external{
+
+        require(creators[_type] == msg.sender, "Credit: sender is not allowed to set minter");
+        require(creators[_type] != _minter, "Credit: cannot set current minter as a new minter");
+        creators[_type] = _minter;
+
+        emit SetMinter( _type, _minter);
+    }
+
+    /**
+        @notice Get the total supply of a Credit.
+        @param _id     ID of the Credit
+        @return        The total supply of the Token type requested
+     */
+    function totalSupply(uint256 _id) view external returns(uint256) {
+        if (isNonFungible(_id)) {
+            uint256 _type = getNonFungibleBaseType(_id);
+            return maxIndex[_type] + 1;
+        } else {
+            return balances[_id][address(0x0)];
+        }
+    }
+
+    /**
+        @notice A distinct Uniform Resource Identifier (URI) for a given token.
+        @dev URIs are defined in RFC 3986.
+        The URI may point to a JSON file that conforms to the "ERC-1155 Metadata URI JSON Schema".
+        @return URI string
+    */
+    function uri(uint256 _id) external view returns (string memory);
+}

@@ -1,11 +1,8 @@
 pragma solidity ^0.5.0;
 
-import "./enjin/ERC1155MixedFungibleMintable.sol";
-import "./enjin/IERC1155Metadata.sol";
+interface IERC1155E /* is ERC1155MixedFungibleMintable, IERC1155Metadata */ {
 
-interface ICredit is ERC1155MixedFungibleMintable, IERC1155Metadata {
-
-    event TransferFullBatch(address indexed _operator, address[] indexed _froms, address[] indexed _tos, uint256[] _ids, uint256[] _values);
+    event FullBatchTransfer(address indexed _operator, address[] indexed _froms, address[] indexed _tos, uint256[] _ids, uint256[] _values);
     event Create(uint256 indexed _id, address _creator);
     event SetMinter(uint256 indexed _type, address _minter);
 

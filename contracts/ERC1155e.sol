@@ -1,13 +1,12 @@
 pragma solidity ^0.5.0;
 
+import "@openzeppelin/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
 import "./IERC1155e.sol";
-import "./IReceiver.sol";
-import "./SafeMath.sol";
-import "./Address.sol";
-import "./Metadata.sol";
+import "./ERC1155MixedFungibleMintable.sol";
 
 
-contract Credit is ICredit, Metadata {
+contract ERC1155E is IERC1155E, ERC1155MixedFungibleMintable {
 
     using SafeMath for uint256;
     using Address for address;
@@ -19,7 +18,7 @@ contract Credit is ICredit, Metadata {
         MUST be revert if no authorized to transfer.
         MUST be revert if `_from`'s `_id` balance less than `_value`.
         MUST be revert if `_from` or `_to` is the zero address.
-        MUST be revert if `_to` is a smart contract but does not implement IReceiver.
+        MUST be revert if `_to` is a smart contract but does not implement ERC1155TokenReceiver.
         MUST be revert if number of `_froms` `_tos` `_ids` and `_values` does not eqaul.
         MUST emit FullBatchTransfer event.
         @param _froms    List of Source addresses
@@ -64,7 +63,7 @@ contract Credit is ICredit, Metadata {
         require(ownerOf(_id) == msg.sender, "Credit: not authorized to burn the credit");
         nfOwners[_id] = address(0);
 
-        emit Transfer(msg.sender, msg.sender, address(0), _id, 1);
+        emit TransferSingle(msg.sender, msg.sender, address(0), _id, 1);
     }
 
     /**
@@ -74,10 +73,9 @@ contract Credit is ICredit, Metadata {
     */
     function burnFungible(uint256 _id, uint256 _quantities) external {
         require(isFungible(_id));
-        balances[_id][msg.sender].sub(_value);
-        balances[_id].sub(_value);
+        balances[_id][msg.sender].sub(_quantities);
 
-        emit Transfer(msg.sender, msg.sender, address(0), _id, _value);
+        emit TransferSingle(msg.sender, msg.sender, address(0), _id, _quantities);
     }
 
     /**
@@ -86,9 +84,7 @@ contract Credit is ICredit, Metadata {
         @param _minter New minter, in case of address 0 the authorized will be locked forever
     */
     function setMinter(uint256 _type, address _minter) external{
-        if (isNonFungible(_type)) {
-            _type = _type | TYPE_NF_BIT;
-        }
+
         require(creators[_type] == msg.sender, "Credit: sender is not allowed to set minter");
         require(creators[_type] != _minter, "Credit: cannot set current minter as a new minter");
         creators[_type] = _minter;
@@ -103,10 +99,10 @@ contract Credit is ICredit, Metadata {
      */
     function totalSupply(uint256 _id) view external returns(uint256) {
         if (isNonFungible(_id)) {
-            uint256 type = getNonFungibleBaseType(id);
-            return maxIndex[type] + 1;
+            uint256 _type = getNonFungibleBaseType(_id);
+            return maxIndex[_type] + 1;
         } else {
-            return balances[_id][0];
+            return balances[_id][address(0x0)];
         }
     }
 }

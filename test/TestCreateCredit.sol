@@ -2,56 +2,31 @@ pragma solidity >=0.4.25 <0.6.0;
 
 import "truffle/Assert.sol";
 import "truffle/DeployedAddresses.sol";
-import "../contracts/ERC1155e.sol";
+import "../contracts/ERC1155MixedFungibleMintable.sol";
 
 contract TestCreateCredit {
 
-    Credit private credit;
-    address private testAccount;
+    ERC1155MixedFungibleMintable private credit;
 
-    function beforeAll() external {
-      credit = new Credit();
-      testAccount = address(0xCA35b7d915458EF540aDe6068dFe2F44E8fa733c);
+    function beforeEach() external {
+      credit = new ERC1155MixedFungibleMintable();
     }
 
-    function testCreateANewCredit() external {
-        Assert.equal(credit.getCurrentID(), 0, "initial credit id should be zero");
-
-        uint expectedInitialSupply = 100000;
-        string memory expectedName = "name";
-        string memory expectedCode = "code";
-        string memory expectedIssuer = "issuer";
-        string memory expectedJson = "json";
-        uint16 expectedDecimals = 10;
-
-        credit.create(expectedInitialSupply, expectedName, expectedCode, expectedIssuer, expectedJson, expectedDecimals);
-
-        uint id = credit.getCurrentID();
-
-        Assert.equal(id, 1, "first credit id should be one");
-        Assert.equal(credit.totalSupply(id), expectedInitialSupply, "the credit totalSupply is incorrect");
-        Assert.equal(credit.name(id), expectedName, "the credit name is incorrect");
-        Assert.equal(credit.code(id), expectedCode, "the credit code is incorrect");
-        Assert.equal(credit.issuer(id), expectedIssuer, "the credit issuer is incorrect");
-        Assert.equal(credit.jsonURL(id), expectedJson, "the credit jsonURL is incorrect");
-        Assert.equal(uint(credit.decimals(id)), uint(expectedDecimals), "the credit decimals is incorrect");
-
+    function testCreateFungibleTypes() external {
+        string memory expectedURI = "foo";
+        bool isNF = false;
+        uint256 expectedID = 1 << 128;
+        credit.create(expectedURI, isNF);
+        Assert.isTrue(credit.isFungible(expectedID), "credit type should be non-fundgible");
+        Assert.equal(credit.creators(expectedID), msg.sender, "message sender should be the one who created the type");
     }
 
-    function testMint() external {
-        uint expectedValue = 100000;
-        uint id = credit.getCurrentID();
-        Assert.equal(id, 1, "initial credit id should be zero");
-        credit.mint(testAccount, id, expectedValue);
-        Assert.equal(credit.balanceOf(testAccount, id), expectedValue, "minting function is failed");
-    }
-
-    function testBurn() external {
-        uint expectedValue = 100000;
-        uint id = credit.getCurrentID();
-        Assert.equal(id, 1, "initial credit id should be zero");
-        credit.burn(id, expectedValue);
-        Assert.equal(credit.balanceOf(tx.origin, id), 0, "minting function is failed");
-    }
-
+    // function testCreateNFTypes() external {
+    //     string memory expectedURI = "foo";
+    //     bool isNF = false;
+    //     uint256 expectedID = 1 << 128 | ;
+    //     credit.create(expectedURI, isNF);
+    //     Assert.isTrue(credit.isNonFungible(expectedID), "credit type should be non-fundgible");
+    //     Assert.equal(credit.creators(expectedID), msg.sender, "message sender should be the one who created the type");
+    // }
 }

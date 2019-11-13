@@ -4,9 +4,10 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "./IERC1155e.sol";
 import "./ERC1155MixedFungibleMintable.sol";
+import "./IERC1155MetaData.sol";
 
 
-contract ERC1155E is IERC1155E, ERC1155MixedFungibleMintable {
+contract ERC1155E is IERC1155E, ERC1155MixedFungibleMintable, ERC1155Metadata_URI {
 
     using SafeMath for uint256;
     using Address for address;
@@ -20,13 +21,13 @@ contract ERC1155E is IERC1155E, ERC1155MixedFungibleMintable {
         MUST be revert if `_from` or `_to` is the zero address.
         MUST be revert if `_to` is a smart contract but does not implement ERC1155TokenReceiver.
         MUST be revert if number of `_froms` `_tos` `_ids` and `_values` does not eqaul.
-        MUST emit FullBatchTransfer event.
+        MUST emit TransferFullBatch event.
         @param _froms    List of Source addresses
         @param _tos      List of Target addresses
         @param _ids      List of ID of the credit types
         @param _values   List of Transfer amounts
     */
-    function safeFullBatchTransfer(address[] calldata _froms, address[] calldata _tos, uint256[] calldata _ids,
+    function safeFullBatchTransferFrom(address[] calldata _froms, address[] calldata _tos, uint256[] calldata _ids,
                                    uint256[] calldata _values, bytes calldata _data) external {
         require(_froms.length == _tos.length && _froms.length == _ids.length && _froms.length == _values.length, "Credit: Array length must match");
 
@@ -51,7 +52,7 @@ contract ERC1155E is IERC1155E, ERC1155MixedFungibleMintable {
             }
         }
 
-        emit FullBatchTransfer(msg.sender, _froms, _tos, _ids, _values);
+        emit TransferFullBatch(msg.sender, _froms, _tos, _ids, _values);
     }
 
     /**
@@ -105,4 +106,12 @@ contract ERC1155E is IERC1155E, ERC1155MixedFungibleMintable {
             return balances[_id][address(0x0)];
         }
     }
+
+    /**
+        @notice A distinct Uniform Resource Identifier (URI) for a given token.
+        @dev URIs are defined in RFC 3986.
+        The URI may point to a JSON file that conforms to the "ERC-1155 Metadata URI JSON Schema".
+        @return URI string
+    */
+    function uri(uint256 _id) external view returns (string memory);
 }

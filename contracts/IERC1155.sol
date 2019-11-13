@@ -1,7 +1,5 @@
 pragma solidity ^0.5.0;
 
-import "@openzeppelin/contracts/introspection/ERC165.sol";
-
 /**
     @title ERC-1155 Multi Token Standard
     @dev See https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1155.md

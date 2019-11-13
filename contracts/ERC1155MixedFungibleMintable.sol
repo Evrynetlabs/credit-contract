@@ -19,7 +19,7 @@ contract ERC1155MixedFungibleMintable is ERC1155MixedFungible {
 
     // This function only creates the type.
     function create(
-        string calldata _uri,
+        string calldata _metalink,
         bool   _isNF)
     external returns(uint256 _type) {
 
@@ -36,8 +36,8 @@ contract ERC1155MixedFungibleMintable is ERC1155MixedFungible {
         // emit a Transfer event with Create semantic to help with discovery.
         emit TransferSingle(msg.sender, address(0x0), address(0x0), _type, 0);
 
-        if (bytes(_uri).length > 0)
-            emit URI(_uri, _type);
+        if (bytes(_metalink).length > 0)
+            emit URI(_metalink, _type);
     }
 
     function mintNonFungible(uint256 _type, address[] calldata _tos) external creatorOnly(_type) {
@@ -48,22 +48,21 @@ contract ERC1155MixedFungibleMintable is ERC1155MixedFungible {
 
         // Index are 1-based.
         uint256 index = maxIndex[_type] + 1;
-        maxIndex[_type] = _to.length.add(maxIndex[_type]);
+        maxIndex[_type] = _tos.length.add(maxIndex[_type]);
 
         for (uint256 i = 0; i < _tos.length; ++i) {
-            address dst = _tos[i];
+            address to = _tos[i];
             uint256 id  = _type | index + i;
 
-            balances[id][to] = 1;
-            nfOwners[id] = dst;
+            nfOwners[id] = to;
 
             // You could use base-type id to store NF type balances if you wish.
-            // balances[_type][dst] = quantity.add(balances[_type][dst]);
+            // balances[_type][to] = quantity.add(balances[_type][to]);
 
-            emit TransferSingle(msg.sender, address(0x0), dst, id, 1);
+            emit TransferSingle(msg.sender, address(0x0), to, id, 1);
 
-            if (dst.isContract()) {
-                _doSafeTransferAcceptanceCheck(msg.sender, msg.sender, dst, id, 1, '');
+            if (to.isContract()) {
+                _doSafeTransferAcceptanceCheck(msg.sender, msg.sender, to, id, 1, '');
             }
         }
     }
@@ -80,7 +79,6 @@ contract ERC1155MixedFungibleMintable is ERC1155MixedFungible {
 
             // Grant the items to the caller
             balances[_id][to] = quantity.add(balances[_id][to]);
-            balances[_id][0] = quantity.add(balances[_id][0]);
 
             // Emit the Transfer/Mint event.
             // the 0x0 source address implies a mint

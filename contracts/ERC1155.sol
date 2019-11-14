@@ -5,10 +5,11 @@ import "./Address.sol";
 import "./IERC1155TokenReceiver.sol";
 import "./IERC1155.sol";
 import "./IERC165.sol";
+import "./Common.sol";
 
 
 // A sample implementation of core ERC1155 function.
-contract ERC1155 is IERC1155, IERC165
+contract ERC1155 is IERC1155, IERC165, Common
 {
     using SafeMath for uint256;
     using Address for address;
@@ -18,10 +19,6 @@ contract ERC1155 is IERC1155, IERC165
 
     // owner => (operator => approved)
     mapping (address => mapping(address => bool)) internal operatorApproval;
-
-    bytes4 constant internal ERC1155_ACCEPTED = 0xf23a6e61; // bytes4(keccak256("onERC1155Received(address,address,uint256,uint256,bytes)"))
-    bytes4 constant internal ERC1155_BATCH_ACCEPTED = 0xbc197c81; // bytes4(keccak256("onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)"))
-
 
 /////////////////////////////////////////// ERC165 //////////////////////////////////////////////
 

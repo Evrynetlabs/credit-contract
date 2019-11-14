@@ -12,12 +12,13 @@ contract ERC1155EWrapper is ERC1155E {
     }
 }
 
-contract TestBalanceOf {
+contract TestOwnership {
 
     ERC1155EWrapper private credit;
     ThrowProxy private throwProxy;
     uint256 private fungibleCreditID;
     uint256 private nonFungibleCreditID;
+    uint256 private notExistingCreditID = 1000;
     uint256 private expectedBalance = 100;
     address private fooAccount = address(1);
     address private barAccount = address(2);
@@ -44,26 +45,30 @@ contract TestBalanceOf {
         Assert.equal(credit.balanceOf(fooAccount, nonFungibleCreditID), 1, "account should own a credit");
         Assert.equal(credit.balanceOf(barAccount, fungibleCreditID), 0, "account should not have a credit balance");
         Assert.equal(credit.balanceOf(barAccount, nonFungibleCreditID), 0, "account should not own a credit");
+        Assert.equal(credit.balanceOf(fooAccount, notExistingCreditID), 0, "account should not have a credit balance");
     }
 
     function testBalanceOfBatch() external {
-        address[] memory owners = new address[](4);
+        address[] memory owners = new address[](5);
         owners[0] = fooAccount;
         owners[1] = fooAccount;
         owners[2] = barAccount;
         owners[3] = barAccount;
+        owners[4] = fooAccount;
 
-        uint256[] memory ids = new uint256[](4);
+        uint256[] memory ids = new uint256[](5);
         ids[0] = fungibleCreditID;
         ids[1] = nonFungibleCreditID;
         ids[2] = fungibleCreditID;
         ids[3] = nonFungibleCreditID;
+        ids[4] = notExistingCreditID;
 
-        uint256[] memory expecteds = new uint256[](4);
+        uint256[] memory expecteds = new uint256[](5);
         expecteds[0] = expectedBalance;
         expecteds[1] = 1;
         expecteds[2] = 0;
         expecteds[3] = 0;
+        expecteds[4] = 0;
 
         ERC1155EWrapper(address(throwProxy)).callBalanceOfBatch(owners, ids, expecteds);
         (bool success, ) = throwProxy.execute.gas(200000)();
@@ -71,25 +76,25 @@ contract TestBalanceOf {
     }
 
     function testErrorBalanceOfBatch() external {
-        address[] memory owners = new address[](4);
+        address[] memory owners = new address[](2);
         owners[0] = fooAccount;
-        owners[1] = fooAccount;
-        owners[2] = barAccount;
-        owners[3] = barAccount;
+        owners[1] = barAccount;
 
         uint256[] memory ids = new uint256[](3);
         ids[0] = fungibleCreditID;
         ids[1] = nonFungibleCreditID;
         ids[2] = fungibleCreditID;
 
-        uint256[] memory expecteds = new uint256[](4);
-        expecteds[0] = expectedBalance;
-        expecteds[1] = 1;
-        expecteds[2] = 0;
-        expecteds[3] = 0;
+        uint256[] memory expecteds = new uint256[](3);
 
         ERC1155EWrapper(address(throwProxy)).callBalanceOfBatch(owners, ids, expecteds);
         (bool success, ) = throwProxy.execute.gas(200000)();
         Assert.isFalse(success, "should throw error");
+    }
+
+    function testOwnerOf() external {
+        Assert.equal(credit.ownerOf(nonFungibleCreditID), fooAccount, "fooAccount should be an owner of the non-fungible credit ID");
+        Assert.equal(credit.ownerOf(fungibleCreditID), address(0), "should return address 0 when it is fungible credit ID");
+        Assert.equal(credit.ownerOf(notExistingCreditID), address(0), "should return address 0 when the credit is not existing");
     }
 }

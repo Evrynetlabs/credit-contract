@@ -42,6 +42,11 @@ contract ERC1155MixedFungible is ERC1155 {
         // A base type has the NF bit but does has an index.
         return (_id & TYPE_NF_BIT == TYPE_NF_BIT) && (_id & NF_INDEX_MASK != 0);
     }
+    /**
+        @notice Get the owner address of the given asset ID
+        @param _id    ID of the Token
+        @return        The _id's _owner address of the Token types requested (i.e. balance for each (owner, id) pair)
+     */
     function ownerOf(uint256 _id) public view returns (address) {
         return nfOwners[_id];
     }

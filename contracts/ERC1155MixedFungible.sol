@@ -101,27 +101,22 @@ contract ERC1155MixedFungible is ERC1155 {
         }
     }
 
-    function balanceOf(address _owner, uint256 _id) external view returns (uint256) {
-        if (isNonFungibleItem(_id))
+    // override
+    function balanceOf(address _owner, uint256 _id) public view returns (uint256) {
+        if (isNonFungibleItem(_id)){
             return nfOwners[_id] == _owner ? 1 : 0;
+        }
         return balances[_id][_owner];
     }
 
+    // override
     function balanceOfBatch(address[] calldata _owners, uint256[] calldata _ids) external view returns (uint256[] memory) {
+        require(_owners.length == _ids.length, "Credit: Array length must match");
 
-        require(_owners.length == _ids.length);
-
-        uint256[] memory balances_ = new uint256[](_owners.length);
-
+        uint256[] memory balances = new uint256[](_owners.length);
         for (uint256 i = 0; i < _owners.length; ++i) {
-            uint256 id = _ids[i];
-            if (isNonFungibleItem(id)) {
-                balances_[i] = nfOwners[id] == _owners[i] ? 1 : 0;
-            } else {
-            	balances_[i] = balances[id][_owners[i]];
-            }
+            balances[i] = balanceOf(_owners[i], _ids[i]);
         }
-
-        return balances_;
+        return balances;
     }
 }

@@ -101,7 +101,13 @@ contract ERC1155MixedFungible is ERC1155 {
         }
     }
 
-    // override
+    /**
+        @notice Get the balance of an account's Tokens.
+        @dev override ERC1155 balanceOf function
+        @param _owner  The address of the token holder
+        @param _id     ID of the Token
+        @return        The _owner's balance of the Token type requested
+     */
     function balanceOf(address _owner, uint256 _id) public view returns (uint256) {
         if (isNonFungibleItem(_id)){
             return nfOwners[_id] == _owner ? 1 : 0;
@@ -109,7 +115,13 @@ contract ERC1155MixedFungible is ERC1155 {
         return balances[_id][_owner];
     }
 
-    // override
+    /**
+        @notice Get the balance of multiple account/token pairs (override)
+        @dev override ERC1155 balanceOfBatch function
+        @param _owners The addresses of the token holders
+        @param _ids    ID of the Tokens
+        @return        The _owner's balance of the Token types requested (i.e. balance for each (owner, id) pair)
+     */
     function balanceOfBatch(address[] calldata _owners, uint256[] calldata _ids) external view returns (uint256[] memory) {
         require(_owners.length == _ids.length, "Credit: Array length must match");
 

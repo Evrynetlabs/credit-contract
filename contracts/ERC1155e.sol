@@ -1,13 +1,11 @@
 pragma solidity ^0.5.0;
 
-import "@openzeppelin/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts/utils/Address.sol";
+import "./SafeMath.sol";
+import "./Address.sol";
 import "./IERC1155e.sol";
 import "./ERC1155MixedFungibleMintable.sol";
-import "./IERC1155MetaData.sol";
 
-
-contract ERC1155E is IERC1155E, ERC1155MixedFungibleMintable, ERC1155Metadata_URI {
+contract ERC1155E is IERC1155E, ERC1155MixedFungibleMintable {
 
     using SafeMath for uint256;
     using Address for address;
@@ -106,12 +104,4 @@ contract ERC1155E is IERC1155E, ERC1155MixedFungibleMintable, ERC1155Metadata_UR
             return balances[_id][address(0x0)];
         }
     }
-
-    /**
-        @notice A distinct Uniform Resource Identifier (URI) for a given token.
-        @dev URIs are defined in RFC 3986.
-        The URI may point to a JSON file that conforms to the "ERC-1155 Metadata URI JSON Schema".
-        @return URI string
-    */
-    function uri(uint256 _id) external view returns (string memory);
 }

@@ -139,7 +139,7 @@ contract ERC1155 is IERC1155, IERC165, Common
         @param _id     ID of the Token
         @return        The _owner's balance of the Token type requested
      */
-    function balanceOf(address _owner, uint256 _id) external view returns (uint256) {
+    function balanceOf(address _owner, uint256 _id) public view returns (uint256) {
         // The balance of any account can be calculated from the Transfer events history.
         // However, since we need to keep the balances to validate transfer request,
         // there is no extra cost to also privide a querry function.
@@ -160,7 +160,7 @@ contract ERC1155 is IERC1155, IERC165, Common
         uint256[] memory balances_ = new uint256[](_owners.length);
 
         for (uint256 i = 0; i < _owners.length; ++i) {
-            balances_[i] = balances[_ids[i]][_owners[i]];
+            balances_[i] = balanceOf(_owners[i], _ids[i]);
         }
 
         return balances_;

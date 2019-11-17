@@ -8,8 +8,6 @@ contract TestCreateCredit {
 
     ERC1155E private credit;
 
-    event addressLogger(address indexed sender);
-
     function beforeEach() external {
       credit = new ERC1155E();
     }
@@ -21,6 +19,7 @@ contract TestCreateCredit {
         uint256 actualID = credit.create(expectedURI, isNF);
         Assert.isTrue(credit.isFungible(expectedID), "credit type should be non-fundgible");
         Assert.equal(actualID, expectedID, "ID from create function should be equal to expected ID");
+        Assert.equal(credit.creators(actualID), address(this), "address creator should be this contract address");
     }
 
     function testCreateNFTypes() external {
@@ -30,5 +29,6 @@ contract TestCreateCredit {
         uint256 actualID = credit.create(expectedURI, isNF);
         Assert.isTrue(credit.isNonFungible(expectedID), "credit type should be non-fundgible");
         Assert.equal(actualID, expectedID, "ID from create function should be equal to expected ID");
+        Assert.equal(credit.creators(actualID), address(this), "address creator should be this contract address");
     }
 }

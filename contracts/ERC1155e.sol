@@ -10,6 +10,8 @@ contract ERC1155E is IERC1155E, ERC1155MixedFungibleMintable {
     using SafeMath for uint256;
     using Address for address;
 
+    event LogAddr(address indexed _address);
+
     /**
         Multiple transfer with [multi-sender] [multi-receiver] and [muti-]credit type.
         @dev Caller must be approved or be an owner of the credit being transferred.
@@ -58,9 +60,14 @@ contract ERC1155E is IERC1155E, ERC1155MixedFungibleMintable {
         @param _id  Credit type
     */
     function burnNonFungible(uint256 _id) external {
+        emit LogAddr(msg.sender);
+        
         require(isNonFungible(_id), "Credit: asset being burned is not a non-fungible asset");
         require(ownerOf(_id) == msg.sender, "Credit: not authorized to burn the credit");
+
+        uint256 _type = this.getNonFungibleBaseType(_id);
         nfOwners[_id] = address(0);
+        balances[_type][msg.sender] = balances[_type][msg.sender].sub(1);
 
         emit TransferSingle(msg.sender, msg.sender, address(0), _id, 1);
     }
@@ -71,8 +78,10 @@ contract ERC1155E is IERC1155E, ERC1155MixedFungibleMintable {
         @param _quantities Burn Credit quantities
     */
     function burnFungible(uint256 _id, uint256 _quantities) external {
+
         require(isFungible(_id));
-        balances[_id][msg.sender].sub(_quantities);
+        
+        balances[_id][msg.sender] = balances[_id][msg.sender].sub(_quantities);
 
         emit TransferSingle(msg.sender, msg.sender, address(0), _id, _quantities);
     }
@@ -82,9 +91,8 @@ contract ERC1155E is IERC1155E, ERC1155MixedFungibleMintable {
         @param _type  Credit type
         @param _minter New minter, in case of address 0 the authorized will be locked forever
     */
-    function setMinter(uint256 _type, address _minter) external{
-
-        require(creators[_type] == msg.sender, "Credit: sender is not allowed to set minter");
+    function setMinter(uint256 _type, address _minter) external creatorOnly(_type) {
+        
         require(creators[_type] != _minter, "Credit: cannot set current minter as a new minter");
         creators[_type] = _minter;
 

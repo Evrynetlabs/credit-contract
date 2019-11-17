@@ -55,15 +55,13 @@ contract ERC1155MixedFungibleMintable is ERC1155MixedFungible {
             uint256 id  = _type | index + i;
 
             nfOwners[id] = to;
-
-            // You could use base-type id to store NF type balances if you wish.
-            // balances[_type][to] = quantity.add(balances[_type][to]);
+            balances[_type][to] = balances[_type][to].add(1);
 
             emit TransferSingle(msg.sender, address(0x0), to, id, 1);
 
-            if (to.isContract()) {
-                _doSafeTransferAcceptanceCheck(msg.sender, msg.sender, to, id, 1, '');
-            }
+            // if (to.isContract()) {
+            //     _doSafeTransferAcceptanceCheck(msg.sender, msg.sender, to, id, 1, '');
+            // }
         }
     }
 
@@ -85,9 +83,9 @@ contract ERC1155MixedFungibleMintable is ERC1155MixedFungible {
             // It will also provide the circulating supply info.
             emit TransferSingle(msg.sender, address(0x0), to, _id, quantity);
 
-            if (to.isContract()) {
-                _doSafeTransferAcceptanceCheck(msg.sender, msg.sender, to, _id, quantity, '');
-            }
+            // if (to.isContract()) {
+            //     _doSafeTransferAcceptanceCheck(msg.sender, msg.sender, to, _id, quantity, '');
+            // }
         }
     }
 }

@@ -10,8 +10,6 @@ contract ERC1155E is IERC1155E, ERC1155MixedFungibleMintable {
     using SafeMath for uint256;
     using Address for address;
 
-    event LogAddr(address indexed _address);
-
     /**
         Multiple transfer with [multi-sender] [multi-receiver] and [muti-]credit type.
         @dev Caller must be approved or be an owner of the credit being transferred.
@@ -60,7 +58,6 @@ contract ERC1155E is IERC1155E, ERC1155MixedFungibleMintable {
         @param _id  Credit type
     */
     function burnNonFungible(uint256 _id) external {
-        emit LogAddr(msg.sender);
         
         require(isNonFungible(_id), "Credit: asset being burned is not a non-fungible asset");
         require(ownerOf(_id) == msg.sender, "Credit: not authorized to burn the credit");

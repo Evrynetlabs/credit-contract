@@ -42,6 +42,11 @@ contract ERC1155MixedFungible is ERC1155 {
         // A base type has the NF bit but does has an index.
         return (_id & TYPE_NF_BIT == TYPE_NF_BIT) && (_id & NF_INDEX_MASK != 0);
     }
+    /**
+        @notice Get the owner address of the given asset ID
+        @param _id    ID of the Token
+        @return        The _id's _owner address of the Token types requested (i.e. balance for each (owner, id) pair)
+     */
     function ownerOf(uint256 _id) public view returns (address) {
         return nfOwners[_id];
     }
@@ -101,27 +106,34 @@ contract ERC1155MixedFungible is ERC1155 {
         }
     }
 
-    function balanceOf(address _owner, uint256 _id) external view returns (uint256) {
-        if (isNonFungibleItem(_id))
+    /**
+        @notice Get the balance of an account's Tokens.
+        @dev override ERC1155 balanceOf function
+        @param _owner  The address of the token holder
+        @param _id     ID of the Token
+        @return        The _owner's balance of the Token type requested
+     */
+    function balanceOf(address _owner, uint256 _id) public view returns (uint256) {
+        if (isNonFungibleItem(_id)){
             return nfOwners[_id] == _owner ? 1 : 0;
+        }
         return balances[_id][_owner];
     }
 
+    /**
+        @notice Get the balance of multiple account/token pairs (override)
+        @dev override ERC1155 balanceOfBatch function
+        @param _owners The addresses of the token holders
+        @param _ids    ID of the Tokens
+        @return        The _owner's balance of the Token types requested (i.e. balance for each (owner, id) pair)
+     */
     function balanceOfBatch(address[] calldata _owners, uint256[] calldata _ids) external view returns (uint256[] memory) {
+        require(_owners.length == _ids.length, "Credit: Array length must match");
 
-        require(_owners.length == _ids.length);
-
-        uint256[] memory balances_ = new uint256[](_owners.length);
-
+        uint256[] memory balances = new uint256[](_owners.length);
         for (uint256 i = 0; i < _owners.length; ++i) {
-            uint256 id = _ids[i];
-            if (isNonFungibleItem(id)) {
-                balances_[i] = nfOwners[id] == _owners[i] ? 1 : 0;
-            } else {
-            	balances_[i] = balances[id][_owners[i]];
-            }
+            balances[i] = balanceOf(_owners[i], _ids[i]);
         }
-
-        return balances_;
+        return balances;
     }
 }

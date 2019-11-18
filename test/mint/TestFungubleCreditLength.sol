@@ -3,7 +3,7 @@ pragma solidity >=0.4.25 <0.6.0;
 import "truffle/Assert.sol";
 import "truffle/DeployedAddresses.sol";
 import "../../contracts/ERC1155e.sol";
-import "../utils/ThrowProxy.sol";
+import "../utils/PayableThrowProxy.sol";
 
 contract TestFungubleCreditLength {
 
@@ -22,7 +22,7 @@ contract TestFungubleCreditLength {
         testAccounts[0] = address(1);
         testAccounts[1] = address(2);
         quantities[0] = 1;
-        ThrowProxy throwProxy = new ThrowProxy(address(credit));
+        PayableThrowProxy throwProxy = new PayableThrowProxy(address(credit));
         ERC1155E proxyCredit = ERC1155E(address(throwProxy));
         uint256 id = credit.create(uri, isNF);
         credit.setMinter(id, address(proxyCredit));

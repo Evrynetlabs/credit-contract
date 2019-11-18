@@ -59,9 +59,9 @@ contract ERC1155MixedFungibleMintable is ERC1155MixedFungible {
 
             emit TransferSingle(msg.sender, address(0x0), to, id, 1);
 
-            // if (to.isContract()) {
-            //     _doSafeTransferAcceptanceCheck(msg.sender, msg.sender, to, id, 1, '');
-            // }
+            if (to.isContract()) {
+                _doSafeTransferAcceptanceCheck(msg.sender, msg.sender, to, id, 1, '');
+            }
         }
     }
 
@@ -83,9 +83,9 @@ contract ERC1155MixedFungibleMintable is ERC1155MixedFungible {
             // It will also provide the circulating supply info.
             emit TransferSingle(msg.sender, address(0x0), to, _id, quantity);
 
-            // if (to.isContract()) {
-            //     _doSafeTransferAcceptanceCheck(msg.sender, msg.sender, to, _id, quantity, '');
-            // }
+            if (to.isContract()) {
+                _doSafeTransferAcceptanceCheck(msg.sender, msg.sender, to, _id, quantity, '');
+            }
         }
     }
 }

@@ -39,6 +39,6 @@ contract TestSetMinter {
         (result, ) = throwProxy.execute();
 
         Assert.isTrue(result, "Should pass since a new minter (address 1) is not a current minter (address(proxyCredit))");
-        Assert.equal(credit.creators(id), address(2), "should pass since minter has beeen set to address 1");
+        Assert.equal(credit.creators(id), address(1), "should pass since minter has beeen set to address 1");
     }
 }

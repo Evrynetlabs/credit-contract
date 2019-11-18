@@ -3,7 +3,6 @@ pragma solidity >=0.4.25 <0.6.0;
 import "truffle/Assert.sol";
 import "truffle/DeployedAddresses.sol";
 import "../../contracts/ERC1155e.sol";
-import "../utils/ThrowProxy.sol";
 
 contract TestNonFungibleBatch {
 

@@ -3,7 +3,7 @@ pragma solidity >=0.4.25 <0.6.0;
 import "truffle/Assert.sol";
 import "truffle/DeployedAddresses.sol";
 import "../../contracts/ERC1155e.sol";
-import "../utils/ThrowProxy.sol";
+import "../utils/PayableThrowProxy.sol";
 
 contract TestFungible {
 
@@ -17,7 +17,7 @@ contract TestFungible {
       testAccounts[0] = address(1);
       
       credit.mintNonFungible(id, testAccounts);
-      ThrowProxy throwProxy = new ThrowProxy(address(credit));
+      PayableThrowProxy throwProxy = new PayableThrowProxy(address(credit));
       ERC1155E proxyCredit = ERC1155E(address(throwProxy));
 
       proxyCredit.burnFungible(id, 1);
@@ -33,7 +33,7 @@ contract TestFungible {
       bool result;
       uint256[] memory quantities = new uint256[](1);
       quantities[0] = 1;
-      ThrowProxy throwProxy = new ThrowProxy(address(credit));
+      PayableThrowProxy throwProxy = new PayableThrowProxy(address(credit));
       ERC1155E proxyCredit = ERC1155E(address(throwProxy)); 
       address[] memory testAccounts = new address[](1);
       testAccounts[0] = address(proxyCredit);
@@ -52,7 +52,7 @@ contract TestFungible {
       bool result;
       uint256[] memory quantities = new uint256[](1);
       quantities[0] = 1;
-      ThrowProxy throwProxy = new ThrowProxy(address(credit));
+      PayableThrowProxy throwProxy = new PayableThrowProxy(address(credit));
       ERC1155E proxyCredit = ERC1155E(address(throwProxy)); 
       address[] memory testAccounts = new address[](1);
       testAccounts[0] = address(proxyCredit);  

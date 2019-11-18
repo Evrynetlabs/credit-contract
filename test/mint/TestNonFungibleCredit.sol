@@ -58,7 +58,7 @@ contract TestNonFungibleCredit {
         proxyCredit.mintNonFungible(_type, testAccounts);
         (result, ) = throwProxy.execute();
 
-        Assert.isTrue(result, "should not pass creatorOnly modifier");
+        Assert.isTrue(result, "should pass creatorOnly modifier");
         Assert.equal(credit.balanceOf(testAccounts[0], _type | 1), 1, "balance should be equal to 1");
     }
 }

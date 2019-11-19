@@ -29,7 +29,7 @@ contract TestNonFungible {
     }
 
 
-    function testAddreses() external {
+    function testAddresses() external {
         uint256 expectedBal = 5;
         address addr = address(1);
 
@@ -46,7 +46,7 @@ contract TestNonFungible {
         Assert.equal(credit.balanceOf(addr, _type), expectedBal, "balance of address 1 should be 5");
 
         for (uint256 i = 0; i < 10; ++i) {
-            Assert.equal(credit.balanceOf(testAccounts[i], _type | i + 1), 1, "balance of address 5 - 10 of each credit should be 1"); 
+            Assert.equal(credit.balanceOf(testAccounts[i], _type + i + 1), 1, "balance of address 5 - 10 of each credit should be 1"); 
         }
     }
 

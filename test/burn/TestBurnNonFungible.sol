@@ -5,7 +5,7 @@ import "truffle/DeployedAddresses.sol";
 import "../../contracts/ERC1155e.sol";
 import "../utils/PayableThrowProxy.sol";
 
-contract TestFungible {
+contract TestBurnNonFungible {
 
     ERC1155E private credit;
     string private uri;
@@ -31,7 +31,7 @@ contract TestFungible {
       proxyCredit = ERC1155E(address(throwProxy));
     }
 
-    function testWhenCreditIsNonFungible() external {
+    function testWhenCreditIsFungible() external {
       isNF = false;
       contractType = credit.create(uri, isNF);
       credit.mintFungible(contractType, testAccounts, quantities);
@@ -41,12 +41,22 @@ contract TestFungible {
       Assert.isFalse(result, "should not pass since type of credit is non fungible");
     }
 
-    function testQuantities() external {
+    function testWhenCallerHasNoPermission() external {
       credit.mintNonFungible(contractType, testAccounts);
 
-      proxyCredit.burnNonFungible(contractType);
+      proxyCredit.burnNonFungible(contractType | 1);
       (result, ) = throwProxy.execute();
-      Assert.equal(credit.balanceOf(testAccounts[0], contractType), 0, "credit after being burned should be 0");
+      Assert.isFalse(result, "should not pass since the caller is not the owner of credit id");
+    }
+
+    function testQuantities() external {
+      testAccounts[0] = address(proxyCredit);
+      credit.mintNonFungible(contractType, testAccounts);
+
+      proxyCredit.burnNonFungible(contractType + 1);
+      (result, ) = throwProxy.execute();
+      Assert.equal(credit.balanceOf(testAccounts[0], contractType), 0, "credit of this type after being burned should be 0");
+      Assert.equal(credit.balanceOf(testAccounts[0], contractType + 1), 0, "credit of this id after being burned should be 0");
       Assert.isTrue(result, "should pass since credit is fungible");
 
       proxyCredit.burnNonFungible(contractType);

@@ -5,7 +5,7 @@ import "truffle/DeployedAddresses.sol";
 import "../../contracts/ERC1155e.sol";
 import "../utils/PayableThrowProxy.sol";
 
-contract TestFungible {
+contract TestMintFungible {
 
     ERC1155E private credit;
     address[] private testAccounts;

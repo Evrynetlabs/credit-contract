@@ -5,7 +5,7 @@ import "truffle/DeployedAddresses.sol";
 import "../../contracts/ERC1155e.sol";
 import "../utils/PayableThrowProxy.sol";
 
-contract TestFungible {
+contract TestBurnFungible {
 
     ERC1155E private credit;
     string private uri;
@@ -41,7 +41,16 @@ contract TestFungible {
       Assert.isFalse(result, "should not pass since type of credit is non fungible");
     }
 
+    function testWhenCallerHasNoPermission() external {
+      credit.mintFungible(id, testAccounts, quantities);
+
+      proxyCredit.burnFungible(id, 1);
+      (result, ) = throwProxy.execute();
+      Assert.isFalse(result, "should not pass since the caller is not the owner of credit id");
+    }
+
     function testQuantities() external {
+      testAccounts[0] = address(proxyCredit);
       credit.mintFungible(id, testAccounts, quantities);
 
       proxyCredit.burnFungible(id, 1);

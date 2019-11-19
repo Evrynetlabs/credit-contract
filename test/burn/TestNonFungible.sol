@@ -10,7 +10,7 @@ contract TestFungible {
     ERC1155E private credit;
     string private uri;
     bool private isNF;
-    uint256 private _type;
+    uint256 private contractType;
     bool private result;
     address[] private testAccounts;
     uint256[] private quantities;
@@ -22,7 +22,7 @@ contract TestFungible {
       uri = "foo";
       isNF = true;
       result = false;
-      _type = credit.create(uri, isNF);
+      contractType = credit.create(uri, isNF);
       testAccounts = new address[](0);
       testAccounts.push(address(1));
       quantities = new uint256[](0);
@@ -33,23 +33,23 @@ contract TestFungible {
 
     function testWhenCreditIsNonFungible() external {
       isNF = false;
-      _type = credit.create(uri, isNF);
-      credit.mintFungible(_type, testAccounts, quantities);
+      contractType = credit.create(uri, isNF);
+      credit.mintFungible(contractType, testAccounts, quantities);
 
-      proxyCredit.burnNonFungible(_type);
+      proxyCredit.burnNonFungible(contractType);
       (result, ) = throwProxy.execute();
       Assert.isFalse(result, "should not pass since type of credit is non fungible");
     }
 
     function testQuantities() external {
-      credit.mintNonFungible(_type, testAccounts);
+      credit.mintNonFungible(contractType, testAccounts);
 
-      proxyCredit.burnNonFungible(_type);
+      proxyCredit.burnNonFungible(contractType);
       (result, ) = throwProxy.execute();
-      Assert.equal(credit.balanceOf(testAccounts[0], _type), 0, "credit after being burned should be 0");
+      Assert.equal(credit.balanceOf(testAccounts[0], contractType), 0, "credit after being burned should be 0");
       Assert.isTrue(result, "should pass since credit is fungible");
 
-      proxyCredit.burnNonFungible(_type);
+      proxyCredit.burnNonFungible(contractType);
       (result, ) = throwProxy.execute();
       Assert.isFalse(result, "should not pass since credit quantity is less than 1");
     }

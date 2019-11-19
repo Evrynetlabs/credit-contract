@@ -48,7 +48,7 @@ contract TestFungible {
         Assert.equal(credit.balanceOf(testAccounts[0], id), quantities[0], "balance should be equal to 1");
     }
 
-    function testAddresses() external {
+    function testBatch() external {
         uint256 expectedBal = 5;
         address addr = address(1);
 

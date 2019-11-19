@@ -29,7 +29,7 @@ contract TestNonFungible {
     }
 
 
-    function testAddresses() external {
+    function testBatch() external {
         uint256 expectedBal = 5;
         address addr = address(1);
 

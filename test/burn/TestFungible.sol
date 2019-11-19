@@ -7,59 +7,50 @@ import "../utils/PayableThrowProxy.sol";
 
 contract TestFungible {
 
+    ERC1155E private credit;
+    string private uri;
+    bool private isNF;
+    uint256 private id;
+    bool private result;
+    address[] private testAccounts;
+    uint256[] private quantities;
+    PayableThrowProxy private throwProxy;
+    ERC1155E private proxyCredit;
+
+    function beforeEach() external {
+      credit = new ERC1155E();
+      uri = "foo";
+      isNF = false;
+      result = false;
+      id = credit.create(uri, isNF);
+      testAccounts = new address[](0);
+      testAccounts.push(address(1));
+      quantities = new uint256[](0);
+      quantities.push(1);
+      throwProxy = new PayableThrowProxy(address(credit));
+      proxyCredit = ERC1155E(address(throwProxy));
+    }
+
     function testWhenCreditIsNonFungible() external {
-      ERC1155E credit = new ERC1155E();
-      string memory uri = "foo";
-      bool isNF = true;
-      uint256 id = credit.create(uri, isNF);
-      bool result;
-      address[] memory testAccounts = new address[](1);
-      testAccounts[0] = address(1);
-      
+      isNF = true;
+      id = credit.create(uri, isNF);
       credit.mintNonFungible(id, testAccounts);
-      PayableThrowProxy throwProxy = new PayableThrowProxy(address(credit));
-      ERC1155E proxyCredit = ERC1155E(address(throwProxy));
 
       proxyCredit.burnFungible(id, 1);
       (result, ) = throwProxy.execute();
       Assert.isFalse(result, "should not pass since type of credit is non fungible");
     }
 
-    function testWhenQuantityIsSufficient() external {
-      ERC1155E credit = new ERC1155E();
-      string memory uri = "foo";
-      bool isNF = false;
-      uint256 id = credit.create(uri, isNF);
-      bool result;
-      uint256[] memory quantities = new uint256[](1);
-      quantities[0] = 1;
-      PayableThrowProxy throwProxy = new PayableThrowProxy(address(credit));
-      ERC1155E proxyCredit = ERC1155E(address(throwProxy)); 
-      address[] memory testAccounts = new address[](1);
-      testAccounts[0] = address(proxyCredit);
+    function testQuantities() external {
       credit.mintFungible(id, testAccounts, quantities);
 
       proxyCredit.burnFungible(id, 1);
       (result, ) = throwProxy.execute();
+      Assert.equal(credit.balanceOf(testAccounts[0], id), 0, "credit after being burned should be 0");
       Assert.isTrue(result, "should pass since credit is fungible");
-    }
 
-    function testWhenQuantityIsInSufficient() external {
-      ERC1155E credit = new ERC1155E();
-      string memory uri = "foo";
-      bool isNF = false;
-      uint256 id = credit.create(uri, isNF);
-      bool result;
-      uint256[] memory quantities = new uint256[](1);
-      quantities[0] = 1;
-      PayableThrowProxy throwProxy = new PayableThrowProxy(address(credit));
-      ERC1155E proxyCredit = ERC1155E(address(throwProxy)); 
-      address[] memory testAccounts = new address[](1);
-      testAccounts[0] = address(proxyCredit);  
-      credit.mintFungible(id, testAccounts, quantities);
-
-      proxyCredit.burnFungible(id, 2);
+      proxyCredit.burnFungible(id, 1);
       (result, ) = throwProxy.execute();
-      Assert.isFalse(result, "should not pass since credit quantity is less than 2");
+      Assert.isFalse(result, "should not pass since credit quantity is less than 1");
     }
 }

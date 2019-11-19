@@ -8,18 +8,32 @@ import "./utils/PayableThrowProxy.sol";
 contract TestSetMinter {
 
     ERC1155E private credit;
+    string private uri;
+    bool private isNF;
+    bool private result;
+    PayableThrowProxy private throwProxy;
+    ERC1155E private proxyCredit;
+    uint256 id;
 
     function beforeEach() external {
         credit = new ERC1155E();
+        uri = "foo";
+        isNF = false;
+        result = false;
+        throwProxy = new PayableThrowProxy(address(credit));
+        proxyCredit = ERC1155E(address(throwProxy));
+        id = credit.create(uri, isNF);
+    }
+
+    function testWhenCallerHasNoPermission() external {
+        credit.setMinter(id, address(1));
+        proxyCredit.setMinter(id, address(2));
+        (result, ) = throwProxy.execute();
+
+        Assert.isFalse(result, "Should not pass since a caller is not a creator of the credit");
     }
 
     function testWhenNewMinterIsCurrentMinter() external {
-        string memory uri = "foo";
-        bool isNF = false;
-        bool result;
-        PayableThrowProxy throwProxy = new PayableThrowProxy(address(credit));
-        ERC1155E proxyCredit = ERC1155E(address(throwProxy));
-        uint256 id = credit.create(uri, isNF);
         credit.setMinter(id, address(proxyCredit));
         proxyCredit.setMinter(id, address(proxyCredit));
         (result, ) = throwProxy.execute();
@@ -28,13 +42,7 @@ contract TestSetMinter {
     }
 
     function testNewMinter() external {
-        string memory uri = "foo";
-        bool isNF = false;
-        bool result;
-        PayableThrowProxy throwProxy = new PayableThrowProxy(address(credit));
-        ERC1155E proxyCredit = ERC1155E(address(throwProxy));
-        uint256 id = credit.create(uri, isNF);
-        credit.setMinter(id, address(proxyCredit));
+        credit.setMinter(id, address(proxyCredit)); 
         proxyCredit.setMinter(id, address(1));
         (result, ) = throwProxy.execute();
 

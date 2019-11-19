@@ -74,7 +74,7 @@ contract TestNonFungible {
         (result, ) = throwProxy.execute();
 
         Assert.isTrue(result, "should pass creatorOnly modifier");
-        Assert.equal(credit.balanceOf(testAccounts[0], _type | 1), 1, "balance should be equal to 1");
+        Assert.equal(credit.balanceOf(testAccounts[0], _type + 1), 1, "balance should be equal to 1");
     }
 
     function testWhenNotImplementOnERC1155Received() external {

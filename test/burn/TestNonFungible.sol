@@ -27,7 +27,7 @@ contract TestNonFungible {
       PayableThrowProxy throwProxy = new PayableThrowProxy(address(credit));
       ERC1155E proxyCredit = ERC1155E(address(throwProxy));
 
-      proxyCredit.burnNonFungible(_type | 1);
+      proxyCredit.burnNonFungible(_type + 1);
       (result, ) = throwProxy.execute();
       Assert.isFalse(result, "should not pass since type of credit is fungible");
     }
@@ -44,11 +44,11 @@ contract TestNonFungible {
       testAccounts[0] = address(throwProxy);
       credit.mintNonFungible(_type, testAccounts);
       
-      proxyCredit.burnNonFungible(_type | 1);
+      proxyCredit.burnNonFungible(_type + 1);
       (result, ) = throwProxy.execute();
       Assert.isTrue(result, "should pass since credit is non fungible");
 
-      proxyCredit.burnNonFungible(_type | 1);
+      proxyCredit.burnNonFungible(_type + 1);
       (result, ) = throwProxy.execute();
       Assert.isFalse(result, "should not pass since balance of type will be less than 0");
     }

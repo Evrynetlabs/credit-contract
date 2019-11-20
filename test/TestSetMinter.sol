@@ -26,7 +26,6 @@ contract TestSetMinter {
     }
 
     function testWhenCallerHasNoPermission() external {
-        credit.setMinter(id, address(1));
         proxyCredit.setMinter(id, address(2));
         (result, ) = throwProxy.execute();
 

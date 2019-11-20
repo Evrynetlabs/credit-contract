@@ -49,14 +49,22 @@ contract TestBurnFungible {
       Assert.isFalse(result, "should not pass since the caller is not the owner of credit id");
     }
 
-    function testQuantities() external {
+    function testWhenSuccess() external {
       testAccounts[0] = address(proxyCredit);
       credit.mintFungible(id, testAccounts, quantities);
 
       proxyCredit.burnFungible(id, 1);
       (result, ) = throwProxy.execute();
-      Assert.equal(credit.balanceOf(testAccounts[0], id), 0, "credit after being burned should be 0");
       Assert.isTrue(result, "should pass since credit is fungible");
+      Assert.equal(credit.balanceOf(testAccounts[0], id), 0, "the balance of this credit id/type after being burned should be 0");
+    }
+
+    function testWhenInsufficientCredit() external {
+      testAccounts[0] = address(proxyCredit);
+      credit.mintFungible(id, testAccounts, quantities);
+
+      proxyCredit.burnFungible(id, 1);
+      (result, ) = throwProxy.execute();
 
       proxyCredit.burnFungible(id, 1);
       (result, ) = throwProxy.execute();

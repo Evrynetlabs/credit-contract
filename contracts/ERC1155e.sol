@@ -84,14 +84,14 @@ contract ERC1155E is IERC1155E, ERC1155MixedFungibleMintable {
     }
 
     /**
-        give `_id` creator authorized to `_minter`.
-        @param _type  Credit type
+        give `_type` creator authorized to `_minter`.
+        @param _type  Credit _id (when credit is fungible) or _type (when credit is non-fungible)
         @param _minter New minter, in case of address 0 the authorized will be locked forever
     */
-    function setMinter(uint256 _type, address _minter) external creatorOnly(_type) {
+    function setMinter(uint256 _type, address _minter) external minterOnly(_type) {
         
-        require(creators[_type] != _minter, "Credit: cannot set current minter as a new minter");
-        creators[_type] = _minter;
+        require(minters[_type] != _minter, "Credit: cannot set current minter as a new minter");
+        minters[_type] = _minter;
 
         emit SetMinter( _type, _minter);
     }

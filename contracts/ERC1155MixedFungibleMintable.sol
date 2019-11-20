@@ -9,11 +9,11 @@ import "./ERC1155MixedFungible.sol";
 contract ERC1155MixedFungibleMintable is ERC1155MixedFungible {
 
     uint256 nonce;
-    mapping (uint256 => address) public creators;
+    mapping (uint256 => address) public minters;
     mapping (uint256 => uint256) public maxIndex;
 
-    modifier creatorOnly(uint256 _id) {
-        require(creators[_id] == msg.sender);
+    modifier minterOnly(uint256 _id) {
+        require(minters[_id] == msg.sender);
         _;
     }
 
@@ -30,8 +30,8 @@ contract ERC1155MixedFungibleMintable is ERC1155MixedFungible {
         if (_isNF)
           _type = _type | TYPE_NF_BIT;
 
-        // This will allow restricted access to creators.
-        creators[_type] = msg.sender;
+        // This will allow restricted access to minters.
+        minters[_type] = msg.sender;
 
         // emit a Transfer event with Create semantic to help with discovery.
         emit TransferSingle(msg.sender, address(0x0), address(0x0), _type, 0);
@@ -40,10 +40,10 @@ contract ERC1155MixedFungibleMintable is ERC1155MixedFungible {
             emit URI(_metalink, _type);
     }
 
-    function mintNonFungible(uint256 _type, address[] calldata _tos) external creatorOnly(_type) {
+    function mintNonFungible(uint256 _type, address[] calldata _tos) external minterOnly(_type) {
 
         // No need to check this is a nf type rather than an id since
-        // creatorOnly() will only let a type pass through.
+        // minterOnly() will only let a type pass through.
         require(isNonFungible(_type));
 
         // Index are 1-based.
@@ -65,7 +65,7 @@ contract ERC1155MixedFungibleMintable is ERC1155MixedFungible {
         }
     }
 
-    function mintFungible(uint256 _id, address[] calldata _tos, uint256[] calldata _quantities) external creatorOnly(_id) {
+    function mintFungible(uint256 _id, address[] calldata _tos, uint256[] calldata _quantities) external minterOnly(_id) {
 
         require(isFungible(_id));
         require(_tos.length == _quantities.length, "Credit: Array length must match");

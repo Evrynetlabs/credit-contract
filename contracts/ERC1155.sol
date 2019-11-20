@@ -67,10 +67,10 @@ contract ERC1155 is IERC1155, IERC165, Common
     */
     function safeTransferFrom(address _from, address _to, uint256 _id, uint256 _value, bytes calldata _data) external {
 
-        require(_to != address(0x0), "_to must be non-zero.");
-        require(_from == msg.sender || operatorApproval[_from][msg.sender] == true, "Need operator approval for 3rd party transfers.");
+        require(_to != address(0), "Credit: cannot send to zero address");
+        require(_from == msg.sender || operatorApproval[_from][msg.sender] == true, "Credit: Need operator approval for 3rd party transfers.");
 
-        // SafeMath will throw with insuficient funds _from
+        // SafeMath will throw with insufficient funds _from
         // or if _id is not valid (balance will be 0)
         balances[_id][_from] = balances[_id][_from].sub(_value);
         balances[_id][_to]   = _value.add(balances[_id][_to]);

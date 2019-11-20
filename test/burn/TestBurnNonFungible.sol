@@ -59,16 +59,4 @@ contract TestBurnNonFungible {
       Assert.equal(credit.balanceOf(testAccounts[0], contractType), 0, "the balance of this credit id/type after being burned should be 0");
       Assert.equal(credit.balanceOf(testAccounts[0], contractType + 1), 0, "the balance of this credit id/type after being burned should be 0");
     }
-
-    function testWhenInsufficientCredit() external {
-      testAccounts[0] = address(proxyCredit);
-      credit.mintNonFungible(contractType, testAccounts);
-
-      proxyCredit.burnNonFungible(contractType + 1);
-      (result, ) = throwProxy.execute();
-
-      proxyCredit.burnNonFungible(contractType);
-      (result, ) = throwProxy.execute();
-      Assert.isFalse(result, "should not pass since credit quantity is less than 1");
-    }
 }

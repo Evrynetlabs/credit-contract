@@ -60,12 +60,6 @@ contract TestBurnFungible {
     }
 
     function testWhenInsufficientCredit() external {
-      testAccounts[0] = address(proxyCredit);
-      credit.mintFungible(id, testAccounts, quantities);
-
-      proxyCredit.burnFungible(id, 1);
-      (result, ) = throwProxy.execute();
-
       proxyCredit.burnFungible(id, 1);
       (result, ) = throwProxy.execute();
       Assert.isFalse(result, "should not pass since credit quantity is less than 1");

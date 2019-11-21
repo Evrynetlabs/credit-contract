@@ -65,10 +65,10 @@ contract TestSafeBatchTransferError {
         Assert.isFalse(result, "should not pass since tos and values contains unequal length");
     }
 
-    function testWhenSourceAddressIsInvalid() external {
+    function testWhenMsgSenderIsNotAuthorized() external {
         proxyCredit.safeBatchTransferFrom(address(1), address(2), idsOrTypes, values, data);
         (result, ) = throwProxy.execute();
-        Assert.isFalse(result, "should not pass since from(source) address is not the msg.sender");
+        Assert.isFalse(result, "should not pass since message sender is not authorized (neither sender or operator)");
     }
     
     function testInsufficientFungibleCredit() external {

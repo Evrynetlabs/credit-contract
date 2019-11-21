@@ -4,6 +4,7 @@ import "truffle/Assert.sol";
 import "truffle/DeployedAddresses.sol";
 import "../../contracts/ERC1155e.sol";
 import "../utils/PayableThrowProxy.sol";
+import "../utils/ThrowProxy.sol";
 
 contract TestSafeBatchTransferSuccess {
 
@@ -64,25 +65,21 @@ contract TestSafeBatchTransferSuccess {
     }
 
     function testValidParametersWithSenderAsAnOperator() external {
-        PayableThrowProxy balanceOwnerCaller = new PayableThrowProxy(address(credit));
-        ERC1155E balanceOwner = ERC1155E(address(balanceOwnerCaller));
-        ids[0] += 1;
-        testAccounts[0] = address(balanceOwner);
-        credit.mintNonFungible(credit.getNonFungibleBaseType(ids[0]), testAccounts);
-        credit.mintFungible(ids[1], testAccounts, quantities);
+        ThrowProxy transferCaller = new ThrowProxy(address(credit));
+        ERC1155E operator = ERC1155E(address(transferCaller));
 
-        balanceOwner.setApprovalForAll(address(proxyCredit), true);
-        (result, ) = balanceOwnerCaller.execute();
-        Assert.isTrue(result, "balance owner should successfully approve proxycredit as an operator");
-        Assert.isTrue(credit.isApprovedForAll(address(balanceOwner), address(proxyCredit)), "proxy credit should be an operator of balance owner");
-
-        proxyCredit.safeBatchTransferFrom(address(balanceOwner), address(2), ids, values, data);
+        proxyCredit.setApprovalForAll(address(operator), true);
         (result, ) = throwProxy.execute();
+        Assert.isTrue(result, "balance owner should successfully approve proxycredit as an operator");
+        Assert.isTrue(credit.isApprovedForAll(address(proxyCredit), address(operator)), "proxy credit should be an operator of balance owner");
+
+        operator.safeBatchTransferFrom(address(proxyCredit), address(1), ids, values, data);
+        (result, ) = transferCaller.execute();
         Assert.isTrue(result, "should pass since parameters are valid");
-        Assert.equal(credit.balanceOf(address(2), ids[0]), 1, "balance of non fungible type of address 2 should be 1");
-        Assert.equal(credit.balanceOf(address(2), ids[1]), 1, "balance of fungible id of address 2 should be 1");
-        Assert.equal(credit.balanceOf(address(balanceOwner), ids[0]), 0, "balance of non fungible type of the former balance owner should be 0");
-        Assert.equal(credit.balanceOf(address(balanceOwner), ids[1]), 0, "balance of fungible id of the former balance owner should be 0");
+        Assert.equal(credit.balanceOf(address(1), ids[0]), 1, "balance of non fungible type of address 2 should be 1");
+        Assert.equal(credit.balanceOf(address(1), ids[1]), 1, "balance of fungible id of address 2 should be 1");
+        Assert.equal(credit.balanceOf(address(proxyCredit), ids[0]), 0, "balance of non fungible type of the former balance owner should be 0");
+        Assert.equal(credit.balanceOf(address(proxyCredit), ids[1]), 0, "balance of fungible id of the former balance owner should be 0");
     }
 
     function testWhenDestinationImplementOnERC1155BatchReceived() external {

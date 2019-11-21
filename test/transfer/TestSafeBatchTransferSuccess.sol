@@ -58,9 +58,11 @@ contract TestSafeBatchTransferSuccess {
         proxyCredit.safeBatchTransferFrom(address(proxyCredit), address(1), ids, values, data);
         (result, ) = throwProxy.execute();
         Assert.isTrue(result, "should pass since parameters are valid");
-        Assert.equal(credit.balanceOf(address(1), ids[0]), 1, "balance of non fungible type of address 2 should be 1");
+        Assert.equal(credit.balanceOf(address(1), ids[0]), 1, "balance of non fungible id of address 2 should be 1");
+        Assert.equal(credit.balanceOf(address(1), ids[0] - 1), 1, "balance of non fungible type of address 2 should be 1");
         Assert.equal(credit.balanceOf(address(1), ids[1]), 1, "balance of fungible id of address 2 should be 1");
-        Assert.equal(credit.balanceOf(address(proxyCredit), ids[0]), 0, "balance of non fungible type of the former balance owner should be 0");
+        Assert.equal(credit.balanceOf(address(proxyCredit), ids[0]), 0, "balance of non fungible id of the former balance owner should be 0");
+        Assert.equal(credit.balanceOf(address(proxyCredit), ids[0] - 1), 0, "balance of non fungible type of the former balance owner should be 0");
         Assert.equal(credit.balanceOf(address(proxyCredit), ids[1]), 0, "balance of fungible id of the former balance owner should be 0");
     }
 
@@ -76,9 +78,11 @@ contract TestSafeBatchTransferSuccess {
         operator.safeBatchTransferFrom(address(proxyCredit), address(1), ids, values, data);
         (result, ) = transferCaller.execute();
         Assert.isTrue(result, "should pass since parameters are valid");
-        Assert.equal(credit.balanceOf(address(1), ids[0]), 1, "balance of non fungible type of address 2 should be 1");
+        Assert.equal(credit.balanceOf(address(1), ids[0]), 1, "balance of non fungible id of address 2 should be 1");
+        Assert.equal(credit.balanceOf(address(1), ids[0] - 1), 1, "balance of non fungible type of address 2 should be 1");
         Assert.equal(credit.balanceOf(address(1), ids[1]), 1, "balance of fungible id of address 2 should be 1");
-        Assert.equal(credit.balanceOf(address(proxyCredit), ids[0]), 0, "balance of non fungible type of the former balance owner should be 0");
+        Assert.equal(credit.balanceOf(address(proxyCredit), ids[0]), 0, "balance of non fungible id of the former balance owner should be 0");
+        Assert.equal(credit.balanceOf(address(proxyCredit), ids[0] - 1), 0, "balance of non fungible type of the former balance owner should be 0");
         Assert.equal(credit.balanceOf(address(proxyCredit), ids[1]), 0, "balance of fungible id of the former balance owner should be 0");
     }
 
@@ -89,9 +93,11 @@ contract TestSafeBatchTransferSuccess {
         proxyCredit.safeBatchTransferFrom(address(proxyCredit), address(destination), ids, values, data);
         (result, ) = throwProxy.execute();
         Assert.isTrue(result, "should pass since parameters are valid");
-        Assert.equal(credit.balanceOf(address(destination), ids[0]), 1, "balance of non fungible type of address 2 should be 1");
+        Assert.equal(credit.balanceOf(address(destination), ids[0]), 1, "balance of non fungible id of address 2 should be 1");
+        Assert.equal(credit.balanceOf(address(destination), ids[0] - 1), 1, "balance of non fungible type of address 2 should be 1");
         Assert.equal(credit.balanceOf(address(destination), ids[1]), 1, "balance of fungible id of address 2 should be 1");
-        Assert.equal(credit.balanceOf(address(proxyCredit), ids[0]), 0, "balance of non fungible type of the former balance owner should be 0");
+        Assert.equal(credit.balanceOf(address(proxyCredit), ids[0]), 0, "balance of non fungible id of the former balance owner should be 0");
+        Assert.equal(credit.balanceOf(address(proxyCredit), ids[0] - 1), 0, "balance of non fungible type of the former balance owner should be 0");
         Assert.equal(credit.balanceOf(address(proxyCredit), ids[1]), 0, "balance of fungible id of the former balance owner should be 0");
     }
 }

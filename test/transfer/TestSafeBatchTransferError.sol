@@ -29,20 +29,20 @@ contract TestSafeBatchTransferError {
       values = new uint256[](0);
       throwProxy = new PayableThrowProxy(address(credit));
       proxyCredit = ERC1155E(address(throwProxy));
-      this.setup();
+      setup();
     }
 
-    function createNonFungible() public returns (uint256 _type) {
+    function createNonFungible() internal returns (uint256 _type) {
         _type =  credit.create(uri, true);
     }
 
-    function createFungible() public returns (uint256 _id) {
+    function createFungible() internal returns (uint256 _id) {
         _id = credit.create(uri, false);
     }
 
-    function setup() public {
-        idsOrTypes.push(this.createNonFungible());
-        idsOrTypes.push(this.createFungible());
+    function setup() internal {
+        idsOrTypes.push(createNonFungible());
+        idsOrTypes.push(createFungible());
         values.push(1);
         values.push(1);
         testAccounts.push(address(proxyCredit));
@@ -53,12 +53,13 @@ contract TestSafeBatchTransferError {
     }
 
     function testTransferToAddressZero() external {
-        proxyCredit.safeBatchTransferFrom(address(credit), address(0x0), idsOrTypes, values, data);
+        proxyCredit.safeBatchTransferFrom(address(credit), address(0), idsOrTypes, values, data);
         (result, ) = throwProxy.execute();
-        Assert.isFalse(result, "should not pass since address is empty(0x0)");
+        Assert.isFalse(result, "should not pass since address is empty(0)");
     }
 
     function testUnequalIdsAndValuesLength() external {
+        values.push(1);
         proxyCredit.safeBatchTransferFrom(address(1), address(2), idsOrTypes, values, data);
         (result, ) = throwProxy.execute();
         Assert.isFalse(result, "should not pass since tos and values contains unequal length");
@@ -71,7 +72,6 @@ contract TestSafeBatchTransferError {
     }
     
     function testInsufficientFungibleCredit() external {
-        idsOrTypes.push(this.createFungible());
         values[1] = 2;
         proxyCredit.safeBatchTransferFrom(address(proxyCredit), address(2), idsOrTypes, values, data);
         (result, ) = throwProxy.execute();
@@ -81,7 +81,6 @@ contract TestSafeBatchTransferError {
     }
 
     function testInsufficientNonFungibleCredit() external {
-        idsOrTypes.push(this.createNonFungible());
         values[0] = 2;
         proxyCredit.safeBatchTransferFrom(address(proxyCredit), address(2), idsOrTypes, values, data);
         (result, ) = throwProxy.execute();

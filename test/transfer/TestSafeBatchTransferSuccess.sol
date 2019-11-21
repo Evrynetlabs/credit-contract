@@ -29,12 +29,12 @@ contract TestSafeBatchTransferSuccess {
         values = new uint256[](0);
         throwProxy = new PayableThrowProxy(address(credit));
         proxyCredit = ERC1155E(address(throwProxy));
-        this.setup();
+        setup();
     }
 
-    function setup() public {
-        uint256 creditType = this.createNonFungible();
-        uint256 id = this.createFungible();
+    function setup() internal {
+        uint256 creditType = createNonFungible();
+        uint256 id = createFungible();
         ids.push(creditType + 1);
         ids.push(id);
         values.push(1);
@@ -45,11 +45,11 @@ contract TestSafeBatchTransferSuccess {
         credit.mintFungible(id, testAccounts, quantities);
     }
  
-    function createNonFungible() public returns (uint256 _type) {
+    function createNonFungible() internal returns (uint256 _type) {
         _type =  credit.create(uri, true);
     }
 
-    function createFungible() public returns (uint256 _id) {
+    function createFungible() internal returns (uint256 _id) {
         _id = credit.create(uri, false);
     }
 

@@ -9,7 +9,7 @@ contract TestSafeBatchTransferError {
 
     ERC1155E private credit;
     string private uri;
-    uint256[] private ids;
+    uint256[] private idsOrTypes;
     uint256[] private values;
     address[] private testAccounts;
     uint256[] private quantities;
@@ -25,10 +25,11 @@ contract TestSafeBatchTransferError {
       data = "data";
       testAccounts = new address[](0);
       quantities = new uint256[](0);
-      ids = new uint256[](0);
+      idsOrTypes = new uint256[](0);
       values = new uint256[](0);
       throwProxy = new PayableThrowProxy(address(credit));
       proxyCredit = ERC1155E(address(throwProxy));
+      this.setup();
     }
 
     function createNonFungible() public returns (uint256 _type) {
@@ -39,59 +40,61 @@ contract TestSafeBatchTransferError {
         _id = credit.create(uri, false);
     }
 
-    function testEmptyDestinationAddress() external {
-        proxyCredit.safeBatchTransferFrom(address(credit), address(0x0), ids, values, data);
+    function setup() public {
+        idsOrTypes.push(this.createNonFungible());
+        idsOrTypes.push(this.createFungible());
+        values.push(1);
+        values.push(1);
+        testAccounts.push(address(proxyCredit));
+        quantities.push(1);
+        credit.mintNonFungible(idsOrTypes[0], testAccounts);
+        credit.mintFungible(idsOrTypes[1], testAccounts, quantities);
+        idsOrTypes[0] += 1;
+    }
+
+    function testTransferToAddressZero() external {
+        proxyCredit.safeBatchTransferFrom(address(credit), address(0x0), idsOrTypes, values, data);
         (result, ) = throwProxy.execute();
         Assert.isFalse(result, "should not pass since address is empty(0x0)");
     }
 
-    function testUnequalTosAndValuesLength() external {
-        proxyCredit.safeBatchTransferFrom(address(1), address(2), ids, values, data);
+    function testUnequalIdsAndValuesLength() external {
+        proxyCredit.safeBatchTransferFrom(address(1), address(2), idsOrTypes, values, data);
         (result, ) = throwProxy.execute();
         Assert.isFalse(result, "should not pass since tos and values contains unequal length");
     }
 
     function testWhenSourceAddressIsInvalid() external {
-        proxyCredit.safeBatchTransferFrom(address(1), address(2), ids, values, data);
+        proxyCredit.safeBatchTransferFrom(address(1), address(2), idsOrTypes, values, data);
         (result, ) = throwProxy.execute();
         Assert.isFalse(result, "should not pass since from(source) address is not the msg.sender");
     }
     
     function testInsufficientFungibleCredit() external {
-        ids.push(this.createFungible());
-        values.push(1);
-        proxyCredit.safeBatchTransferFrom(address(proxyCredit), address(2), ids, values, data);
+        idsOrTypes.push(this.createFungible());
+        values[1] = 2;
+        proxyCredit.safeBatchTransferFrom(address(proxyCredit), address(2), idsOrTypes, values, data);
         (result, ) = throwProxy.execute();
         Assert.isFalse(result, "should not pass since insufficient amount");
+        Assert.equal(credit.balanceOf(address(proxyCredit), idsOrTypes[0]), 1, "balance of the balance owner should be the same after reverted");
+        Assert.equal(credit.balanceOf(address(proxyCredit), idsOrTypes[1]), 1, "balance of the balance owner should be the same after reverted");
     }
 
     function testInsufficientNonFungibleCredit() external {
-        ids.push(this.createNonFungible());
-        values.push(1);
-        proxyCredit.safeBatchTransferFrom(address(proxyCredit), address(2), ids, values, data);
+        idsOrTypes.push(this.createNonFungible());
+        values[0] = 2;
+        proxyCredit.safeBatchTransferFrom(address(proxyCredit), address(2), idsOrTypes, values, data);
         (result, ) = throwProxy.execute();
         Assert.isFalse(result, "should not pass since insufficient amount");
+        Assert.equal(credit.balanceOf(address(proxyCredit), idsOrTypes[0]), 1, "balance of the balance owner should be the same after reverted");
+        Assert.equal(credit.balanceOf(address(proxyCredit), idsOrTypes[1]), 1, "balance of the balance owner should be the same after reverted");
     }
 
     function testWhenDestinationNotImplementOnERC1155BatchReceived() external {
-        PayableThrowProxy balanceOwnerCaller = new PayableThrowProxy(address(credit));
-        ERC1155E balanceOwner = ERC1155E(address(balanceOwnerCaller));
-        ids.push(this.createNonFungible());
-        ids.push(this.createFungible());
-        values.push(1);
-        values.push(1);
-        testAccounts.push(address(balanceOwner));
-        quantities.push(1);
-        credit.mintNonFungible(ids[0], testAccounts);
-        credit.mintFungible(ids[1], testAccounts, quantities);
-
-        balanceOwner.setApprovalForAll(address(proxyCredit), true);
-        (result, ) = balanceOwnerCaller.execute();
-        Assert.isTrue(result, "balance owner should successfully approve proxycredit as an operator");
-
-        ids[0] += 1;
-        proxyCredit.safeBatchTransferFrom(address(balanceOwner), address(this), ids, values, data);
+        proxyCredit.safeBatchTransferFrom(address(proxyCredit), address(this), idsOrTypes, values, data);
         (result, ) = throwProxy.execute();
         Assert.isFalse(result, "should not pass since the destination does not implement OnERC1155BatchReceived");
+        Assert.equal(credit.balanceOf(address(proxyCredit), idsOrTypes[0]), 1, "balance of the balance owner should be the same after reverted");
+        Assert.equal(credit.balanceOf(address(proxyCredit), idsOrTypes[1]), 1, "balance of the balance owner should be the same after reverted");
     }
 }

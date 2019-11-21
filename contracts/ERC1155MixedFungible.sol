@@ -93,6 +93,9 @@ contract ERC1155MixedFungible is ERC1155 {
             if (isNonFungible(id)) {
                 require(nfOwners[id] == _from);
                 nfOwners[id] = _to;
+                uint256 baseType = getNonFungibleBaseType(id);
+                balances[baseType][_from] = balances[baseType][_from].sub(1);
+                balances[baseType][_to]   = balances[baseType][_to].add(1);
             } else {
                 balances[id][_from] = balances[id][_from].sub(value);
                 balances[id][_to]   = value.add(balances[id][_to]);

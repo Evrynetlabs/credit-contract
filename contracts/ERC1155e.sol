@@ -5,7 +5,7 @@ import "./Address.sol";
 import "./IERC1155e.sol";
 import "./ERC1155MixedFungibleMintable.sol";
 
-contract ERC1155E is IERC1155E, ERC1155MixedFungibleMintable {
+contract ERC1155e is IERC1155e, ERC1155MixedFungibleMintable {
 
     using SafeMath for uint256;
     using Address for address;

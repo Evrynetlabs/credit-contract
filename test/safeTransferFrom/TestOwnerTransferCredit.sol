@@ -6,14 +6,14 @@ import "../utils/PayableThrowProxy.sol";
 import "../../contracts/ERC1155e.sol";
 
 contract TestOwnerTransferCredit {
-    ERC1155E private credit;
+    ERC1155e private credit;
     PayableThrowProxy private fooAccountProxy;
     address private fooAccount;
     uint256 private initialCreditBalance = 100;
     uint256 private transferringAmount = 30;
 
     function beforeEach() external {
-        credit = new ERC1155E();
+        credit = new ERC1155e();
         fooAccountProxy = new PayableThrowProxy(address(credit));
         fooAccount = address(fooAccountProxy);
     }
@@ -37,7 +37,7 @@ contract TestOwnerTransferCredit {
         tos[0] = fooAccount;
 
         credit.mintNonFungible(nonFungibleCreditType, tos);
-        return nonFungibleCreditType + 1;
+        return nonFungibleCreditType;
     }
 
     function testTransferFungibleCreditToAccount() external {
@@ -50,7 +50,7 @@ contract TestOwnerTransferCredit {
         Assert.equal(initialFooAccountBalance, initialCreditBalance, "account should have an initial balance of credit");
         Assert.equal(initialBarAccountBalance, 0, "account should have no credit balance");
 
-        ERC1155E(fooAccount).safeTransferFrom(fooAccount, barAccount, fungibleCreditID, transferringAmount, bytes(""));
+        ERC1155e(fooAccount).safeTransferFrom(fooAccount, barAccount, fungibleCreditID, transferringAmount, bytes(""));
         (bool success, ) = fooAccountProxy.execute.gas(200000)();
         Assert.isTrue(success, "should not throw error transferring fungible credit");
 
@@ -62,16 +62,21 @@ contract TestOwnerTransferCredit {
     }
 
     function testTransferNonFungibleCreditToAccount() external {
-        uint256 nonFungibleCreditID = prepareNonFungible();
+        uint256 nonFungibleCreditType = prepareNonFungible();
+        uint256 nonFungibleCreditID = nonFungibleCreditType + 1;
         address barAccount = address(1);
 
+        Assert.equal(credit.balanceOf(fooAccount, nonFungibleCreditType), 1, "balance of non fungible credit type of the foo account should be 1");
+        Assert.equal(credit.balanceOf(barAccount, nonFungibleCreditType), 0, "balance of non fungible credit type of the bar account should be 0");
         Assert.equal(credit.balanceOf(fooAccount, nonFungibleCreditID), 1, "foo account should own non-fungible credit");
         Assert.equal(credit.balanceOf(barAccount, nonFungibleCreditID), 0, "bar account should not own non-fungible credit");
 
-        ERC1155E(fooAccount).safeTransferFrom(fooAccount, barAccount, nonFungibleCreditID, 1, bytes(""));
+        ERC1155e(fooAccount).safeTransferFrom(fooAccount, barAccount, nonFungibleCreditID, 1, bytes(""));
         (bool success, ) = fooAccountProxy.execute.gas(200000)();
         Assert.isTrue(success, "should not throw error transferring non-fungible credit");
 
+        Assert.equal(credit.balanceOf(fooAccount, nonFungibleCreditType), 0, "balance of non fungible credit type of the foo account should be 0");
+        Assert.equal(credit.balanceOf(barAccount, nonFungibleCreditType), 1, "balance of non fungible credit type of the bar account should be 1");
         Assert.equal(credit.balanceOf(fooAccount, nonFungibleCreditID), 0, "foo account should not own non-fungible credit");
         Assert.equal(credit.balanceOf(barAccount, nonFungibleCreditID), 1, "bar account should own non-fungible credit");
     }
@@ -87,7 +92,7 @@ contract TestOwnerTransferCredit {
         Assert.equal(initialFooAccountBalance, initialCreditBalance, "account should have an initial balance of credit");
         Assert.equal(initialBarAccountBalance, 0, "account should have no credit balance");
 
-        ERC1155E(fooAccount).safeTransferFrom(fooAccount, barAccount, fungibleCreditID, transferringAmount, bytes(""));
+        ERC1155e(fooAccount).safeTransferFrom(fooAccount, barAccount, fungibleCreditID, transferringAmount, bytes(""));
         (bool success, ) = fooAccountProxy.execute.gas(200000)();
         Assert.isTrue(success, "should not throw error transferring fungible credit");
 
@@ -99,17 +104,22 @@ contract TestOwnerTransferCredit {
     }
 
     function testTransferNonFungibleCreditToTokenReceivedContract() external {
-        uint256 nonFungibleCreditID = prepareNonFungible();
+        uint256 nonFungibleCreditType = prepareNonFungible();
+        uint256 nonFungibleCreditID = nonFungibleCreditType + 1;
         PayableThrowProxy barAccountProxy = new PayableThrowProxy(address(credit));
         address barAccount = address(barAccountProxy);
 
+        Assert.equal(credit.balanceOf(fooAccount, nonFungibleCreditType), 1, "balance of non fungible credit type of the foo account should be 1");
+        Assert.equal(credit.balanceOf(barAccount, nonFungibleCreditType), 0, "balance of non fungible credit type of the bar account should be 0");
         Assert.equal(credit.balanceOf(fooAccount, nonFungibleCreditID), 1, "foo account should own non-fungible credit");
         Assert.equal(credit.balanceOf(barAccount, nonFungibleCreditID), 0, "bar account should not own non-fungible credit");
 
-        ERC1155E(fooAccount).safeTransferFrom(fooAccount, barAccount, nonFungibleCreditID, 1, bytes(""));
+        ERC1155e(fooAccount).safeTransferFrom(fooAccount, barAccount, nonFungibleCreditID, 1, bytes(""));
         (bool success, ) = fooAccountProxy.execute.gas(200000)();
         Assert.isTrue(success, "should not throw error transferring non-fungible credit");
 
+        Assert.equal(credit.balanceOf(fooAccount, nonFungibleCreditType), 0, "balance of non fungible credit type of the foo account should be 0");
+        Assert.equal(credit.balanceOf(barAccount, nonFungibleCreditType), 1, "balance of non fungible credit type of the bar account should be 1");
         Assert.equal(credit.balanceOf(fooAccount, nonFungibleCreditID), 0, "foo account should not own non-fungible credit");
         Assert.equal(credit.balanceOf(barAccount, nonFungibleCreditID), 1, "bar account should own non-fungible credit");
     }

@@ -7,18 +7,18 @@ import "../utils/PayableThrowProxy.sol";
 
 contract TestMintFungible {
 
-    ERC1155E private credit;
+    ERC1155e private credit;
     address[] private testAccounts;
     uint256[] private quantities;
     bool private isNF;
     bool private result;
     uint256 private id;
-    ERC1155E private proxyCredit;
+    ERC1155e private proxyCredit;
     PayableThrowProxy private throwProxy;
     string private uri;
 
     function beforeEach() external {
-        credit = new ERC1155E();
+        credit = new ERC1155e();
         uri = "foo";
         testAccounts = new address[](0);
         quantities = new uint256[](0);
@@ -28,7 +28,7 @@ contract TestMintFungible {
         testAccounts.push(address(1));
         quantities.push(1);
         throwProxy = new PayableThrowProxy(address(credit));
-        proxyCredit = ERC1155E(address(throwProxy));
+        proxyCredit = ERC1155e(address(throwProxy));
     }
 
     function testWhenMinterHasNoPermission() external {
@@ -92,7 +92,7 @@ contract TestMintFungible {
 
     function testWhenNotImplementOnERC1155Received() external {
         ThrowProxy _throwProxy = new ThrowProxy(address(credit));
-        ERC1155E _proxyCredit = ERC1155E(address(_throwProxy));
+        ERC1155e _proxyCredit = ERC1155e(address(_throwProxy));
         testAccounts[0] = address(_proxyCredit);
         credit.setMinter(id, address(_proxyCredit));
         _proxyCredit.mintFungible(id, testAccounts, quantities);

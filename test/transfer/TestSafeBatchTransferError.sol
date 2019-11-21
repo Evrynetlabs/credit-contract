@@ -7,19 +7,19 @@ import "../utils/PayableThrowProxy.sol";
 
 contract TestSafeBatchTransferError {
 
-    ERC1155E private credit;
+    ERC1155e private credit;
     string private uri;
     uint256[] private ids;
     uint256[] private values;
     address[] private testAccounts;
     uint256[] private quantities;
     PayableThrowProxy private throwProxy;
-    ERC1155E private proxyCredit;
+    ERC1155e private proxyCredit;
     bytes private data;
     bool result;
 
     function beforeEach() external {
-      credit = new ERC1155E();
+      credit = new ERC1155e();
       uri = "foo";
       result = false;
       data = "data";
@@ -28,7 +28,7 @@ contract TestSafeBatchTransferError {
       ids = new uint256[](0);
       values = new uint256[](0);
       throwProxy = new PayableThrowProxy(address(credit));
-      proxyCredit = ERC1155E(address(throwProxy));
+      proxyCredit = ERC1155e(address(throwProxy));
       setup();
     }
 

@@ -6,10 +6,10 @@ import "../contracts/ERC1155e.sol";
 
 contract TestCreateCredit {
 
-    ERC1155E private credit;
+    ERC1155e private credit;
 
     function beforeEach() external {
-      credit = new ERC1155E();
+      credit = new ERC1155e();
     }
 
     function testCreateFungibleTypes() external {

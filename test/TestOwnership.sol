@@ -4,8 +4,8 @@ import "truffle/Assert.sol";
 import "./utils/ThrowProxy.sol";
 import "../contracts/ERC1155e.sol";
 
-contract ERC1155EWrapper is ERC1155E {
-    constructor() public ERC1155E(){}
+contract ERC1155eWrapper is ERC1155e {
+    constructor() public ERC1155e(){}
 
     function callBalanceOfBatch(address[] calldata _owners, uint256[] calldata _ids, uint256[] calldata _expecteds) external {
         Assert.equal(this.balanceOfBatch(_owners, _ids), _expecteds, "balances are invalid");
@@ -14,7 +14,7 @@ contract ERC1155EWrapper is ERC1155E {
 
 contract TestOwnership {
 
-    ERC1155EWrapper private credit;
+    ERC1155eWrapper private credit;
     ThrowProxy private throwProxy;
     uint256 private fungibleCreditID;
     uint256 private nonFungibleCreditID;
@@ -24,7 +24,7 @@ contract TestOwnership {
     address private barAccount = address(2);
 
     function beforeEach() external {
-        credit = new ERC1155EWrapper();
+        credit = new ERC1155eWrapper();
         throwProxy = new ThrowProxy(address(credit));
         fungibleCreditID = credit.create("", false);
         uint256 nonFungibleCreditType = credit.create("", true);
@@ -70,7 +70,7 @@ contract TestOwnership {
         expecteds[3] = 0;
         expecteds[4] = 0;
 
-        ERC1155EWrapper(address(throwProxy)).callBalanceOfBatch(owners, ids, expecteds);
+        ERC1155eWrapper(address(throwProxy)).callBalanceOfBatch(owners, ids, expecteds);
         (bool success, ) = throwProxy.execute.gas(200000)();
         Assert.isTrue(success, "should not throw error");
     }
@@ -87,7 +87,7 @@ contract TestOwnership {
 
         uint256[] memory expecteds = new uint256[](3);
 
-        ERC1155EWrapper(address(throwProxy)).callBalanceOfBatch(owners, ids, expecteds);
+        ERC1155eWrapper(address(throwProxy)).callBalanceOfBatch(owners, ids, expecteds);
         (bool success, ) = throwProxy.execute.gas(200000)();
         Assert.isFalse(success, "should throw error");
     }

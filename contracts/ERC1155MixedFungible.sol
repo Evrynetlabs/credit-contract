@@ -75,10 +75,9 @@ contract ERC1155MixedFungible is ERC1155 {
             require(nfOwners[_id] == _from);
             nfOwners[_id] = _to;
 
-// TODO: support balanceOf baseType
-//            uint256 baseType = getNonFungibleBaseType(_id);
-//            balances[baseType][_from] = balances[baseType][_from].sub(_value);
-//            balances[baseType][_to]   = balances[baseType][_to].add(_value);
+           uint256 baseType = getNonFungibleBaseType(_id);
+           balances[baseType][_from] = balances[baseType][_from].sub(_value);
+           balances[baseType][_to]   = balances[baseType][_to].add(_value);
         } else {
             // SafeMath will throw with insufficient funds _from
             // or if _id is not valid (balance will be 0)

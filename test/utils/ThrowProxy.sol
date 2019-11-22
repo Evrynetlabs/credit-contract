@@ -1,7 +1,5 @@
 pragma solidity ^0.5.0;
 
-import "../../contracts/IERC1155TokenReceiver.sol";
-
 contract ThrowProxy {
     address public target;
     bytes data;

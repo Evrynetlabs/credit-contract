@@ -20,6 +20,7 @@ contract TestOperatorTransferCredit {
         fooAccount = address(fooAccountProxy);
         operatorAccountProxy = new ThrowProxy(address(credit));
         operatorAccount = address(operatorAccountProxy);
+        prepareOperator(true);
     }
 
     function prepareFungible() internal returns(uint256) {
@@ -53,7 +54,6 @@ contract TestOperatorTransferCredit {
     function testTransferFungibleCreditToAccount() external {
         uint256 fungibleCreditID = prepareFungible();
         address barAccount = address(1);
-        prepareOperator(true);
 
         Assert.isTrue(credit.isApprovedForAll(fooAccount, operatorAccount), "operator account does not have the permission");
 
@@ -78,7 +78,6 @@ contract TestOperatorTransferCredit {
         uint256 nonFungibleCreditType = prepareNonFungible();
         uint256 nonFungibleCreditID = nonFungibleCreditType + 1;
         address barAccount = address(1);
-        prepareOperator(true);
 
         Assert.equal(credit.balanceOf(fooAccount, nonFungibleCreditType), 1, "balance of non fungible credit type of the foo account should be 1");
         Assert.equal(credit.balanceOf(barAccount, nonFungibleCreditType), 0, "balance of non fungible credit type of the bar account should be 0");
@@ -99,7 +98,6 @@ contract TestOperatorTransferCredit {
         uint256 fungibleCreditID = prepareFungible();
         PayableThrowProxy barAccountProxy = new PayableThrowProxy(address(credit));
         address barAccount = address(barAccountProxy);
-        prepareOperator(true);
 
         uint256 initialFooAccountBalance = credit.balanceOf(fooAccount, fungibleCreditID);
         uint256 initialBarAccountBalance = credit.balanceOf(barAccount, fungibleCreditID);
@@ -123,7 +121,6 @@ contract TestOperatorTransferCredit {
         uint256 nonFungibleCreditID = nonFungibleCreditType + 1;
         PayableThrowProxy barAccountProxy = new PayableThrowProxy(address(credit));
         address barAccount = address(barAccountProxy);
-        prepareOperator(true);
 
         Assert.equal(credit.balanceOf(fooAccount, nonFungibleCreditType), 1, "balance of non fungible credit type of the foo account should be 1");
         Assert.equal(credit.balanceOf(barAccount, nonFungibleCreditType), 0, "balance of non fungible credit type of the bar account should be 0");

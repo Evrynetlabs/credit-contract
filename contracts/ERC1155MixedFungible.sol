@@ -36,7 +36,7 @@ contract ERC1155MixedFungible is ERC1155 {
     }
     function isNonFungibleBaseType(uint256 _id) public pure returns(bool) {
         // A base type has the NF bit but does not have an index.
-        return isNonFungible(_id) && (_id & NF_INDEX_MASK == 0);
+        return isNonFungible(_id) && getNonFungibleIndex(_id) == 0;
     }
     function isNonFungibleItem(uint256 _id) public pure returns(bool) {
         // A base type has the NF bit but does has an index.

@@ -36,11 +36,11 @@ contract ERC1155MixedFungible is ERC1155 {
     }
     function isNonFungibleBaseType(uint256 _id) public pure returns(bool) {
         // A base type has the NF bit but does not have an index.
-        return (_id & TYPE_NF_BIT == TYPE_NF_BIT) && (_id & NF_INDEX_MASK == 0);
+        return isNonFungible(_id) && getNonFungibleIndex(_id) == 0;
     }
     function isNonFungibleItem(uint256 _id) public pure returns(bool) {
         // A base type has the NF bit but does has an index.
-        return (_id & TYPE_NF_BIT == TYPE_NF_BIT) && (_id & NF_INDEX_MASK != 0);
+        return isNonFungible(_id) && (_id & NF_INDEX_MASK != 0);
     }
     /**
         @notice Get the owner address of the given asset ID
@@ -51,26 +51,45 @@ contract ERC1155MixedFungible is ERC1155 {
         return nfOwners[_id];
     }
 
-    // override
+    /**
+        @notice Transfers `_value` amount of an `_id` from the `_from` address to the `_to` address specified (with safety call).
+        @dev Caller must be approved to manage the tokens being transferred out of the `_from` account (see "Approval" section of the standard).
+        MUST revert if `_to` is the zero address.
+        MUST revert if balance of holder for token `_id` is lower than the `_value` sent.
+        MUST revert on any other error.
+        MUST emit the `TransferSingle` event to reflect the balance change (see "Safe Transfer Rules" section of the standard).
+        After the above conditions are met, this function MUST check if `_to` is a smart contract (e.g. code size > 0). If so, it MUST call `onERC1155Received` on `_to` and act appropriately (see "Safe Transfer Rules" section of the standard).
+        override ERC1155 safeTransferFrom function
+        @param _from    Source address
+        @param _to      Target address
+        @param _id      ID of the token type
+        @param _value   Transfer amount
+        @param _data    Additional data with no specified format, MUST be sent unaltered in call to `onERC1155Received` on `_to`
+    */
     function safeTransferFrom(address _from, address _to, uint256 _id, uint256 _value, bytes calldata _data) external {
 
-        require(_to != address(0x0), "cannot send to zero address");
-        require(_from == msg.sender || operatorApproval[_from][msg.sender] == true, "Need operator approval for 3rd party transfers.");
+        require(_to != address(0x0), "Credit: cannot send to zero address");
+        require(_from == msg.sender || operatorApproval[_from][msg.sender] == true, "Credit: Need operator approval for 3rd party transfers.");
 
         if (isNonFungible(_id)) {
             require(nfOwners[_id] == _from);
             nfOwners[_id] = _to;
-            // You could keep balance of NF type in base type id like so:
-            // uint256 baseType = getNonFungibleBaseType(_id);
-            // balances[baseType][_from] = balances[baseType][_from].sub(_value);
-            // balances[baseType][_to]   = balances[baseType][_to].add(_value);
+
+           uint256 baseType = getNonFungibleBaseType(_id);
+           balances[baseType][_from] = balances[baseType][_from].sub(_value);
+           balances[baseType][_to]   = balances[baseType][_to].add(_value);
         } else {
+            // SafeMath will throw with insufficient funds _from
+            // or if _id is not valid (balance will be 0)
             balances[_id][_from] = balances[_id][_from].sub(_value);
             balances[_id][_to]   = balances[_id][_to].add(_value);
         }
 
+        // MUST emit event
         emit TransferSingle(msg.sender, _from, _to, _id, _value);
 
+        // Now that the balance is updated and the event was emitted,
+        // call onERC1155Received if the destination is a contract.
         if (_to.isContract()) {
             _doSafeTransferAcceptanceCheck(msg.sender, _from, _to, _id, _value, _data);
         }

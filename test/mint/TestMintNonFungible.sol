@@ -7,17 +7,17 @@ import "../utils/PayableThrowProxy.sol";
 
 contract TestMintNonFungible {
 
-    ERC1155E private credit;
+    ERC1155e private credit;
     address[] private testAccounts;
     bool private isNF;
     bool private result;
     uint256 private contractType;
-    ERC1155E private proxyCredit;
+    ERC1155e private proxyCredit;
     PayableThrowProxy private throwProxy;
     string private uri;
 
     function beforeEach() external {
-        credit = new ERC1155E();
+        credit = new ERC1155e();
         uri = "foo";
         testAccounts = new address[](0);
         isNF = true;
@@ -25,7 +25,7 @@ contract TestMintNonFungible {
         contractType = credit.create(uri, isNF);
         testAccounts.push(address(1));
         throwProxy = new PayableThrowProxy(address(credit));
-        proxyCredit = ERC1155E(address(throwProxy));
+        proxyCredit = ERC1155e(address(throwProxy));
     }
 
 
@@ -79,7 +79,7 @@ contract TestMintNonFungible {
 
     function testWhenNotImplementOnERC1155Received() external {
         ThrowProxy _throwProxy = new ThrowProxy(address(credit));
-        ERC1155E _proxyCredit = ERC1155E(address(_throwProxy));
+        ERC1155e _proxyCredit = ERC1155e(address(_throwProxy));
         testAccounts[0] = address(_proxyCredit);
         credit.setMinter(contractType, address(_proxyCredit));
         _proxyCredit.mintNonFungible(contractType, testAccounts);

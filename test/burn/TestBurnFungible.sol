@@ -7,7 +7,7 @@ import "../utils/PayableThrowProxy.sol";
 
 contract TestBurnFungible {
 
-    ERC1155E private credit;
+    ERC1155e private credit;
     string private uri;
     bool private isNF;
     uint256 private id;
@@ -15,10 +15,10 @@ contract TestBurnFungible {
     address[] private testAccounts;
     uint256[] private quantities;
     PayableThrowProxy private throwProxy;
-    ERC1155E private proxyCredit;
+    ERC1155e private proxyCredit;
 
     function beforeEach() external {
-      credit = new ERC1155E();
+      credit = new ERC1155e();
       uri = "foo";
       isNF = false;
       result = false;
@@ -28,7 +28,7 @@ contract TestBurnFungible {
       quantities = new uint256[](0);
       quantities.push(1);
       throwProxy = new PayableThrowProxy(address(credit));
-      proxyCredit = ERC1155E(address(throwProxy));
+      proxyCredit = ERC1155e(address(throwProxy));
     }
 
     function testWhenCreditIsNonFungible() external {

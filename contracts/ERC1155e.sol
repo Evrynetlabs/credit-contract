@@ -40,7 +40,10 @@ contract ERC1155e is IERC1155e, ERC1155MixedFungibleMintable {
             require(from == msg.sender || operatorApproval[from][msg.sender] == true, "Credit: Need operator approval for 3rd party transfers.");
             if (isNonFungible(id)) {
                 require(nfOwners[id] == from);
+                uint256 baseType = getNonFungibleBaseType(id);
                 nfOwners[id] = to;
+                balances[baseType][from] = balances[baseType][from].sub(1);
+                balances[baseType][to]   = balances[baseType][to].add(1);
             } else {
                 balances[id][from] = balances[id][from].sub(value);
                 balances[id][to]   = value.add(balances[id][to]);

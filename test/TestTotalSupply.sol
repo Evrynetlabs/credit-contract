@@ -24,7 +24,7 @@ contract TestTotalSupply {
         return fungibleCreditID;
     }
 
-    function prepareNonFungible() internal returns(uint256){
+    function prepareNonFungible() internal returns(uint256) {
         uint256 nonFungibleCreditType = credit.create("", true);
 
         address[] memory tos = new address[](1);
@@ -37,7 +37,7 @@ contract TestTotalSupply {
     function testTotalSupplyOfFungibleType() external {
         uint256 fungibleCreditID = prepareFungible();
 
-        Assert.equal(initialCreditBalance, credit.totalSupply(fungibleCreditID), "total supply of fungible credit type should be 100");
+        Assert.equal(initialCreditBalance, credit.totalSupply(fungibleCreditID), "total supply of fungible credit type should be equal to the expected total amount");
     }
 
     function testTotalSupplyOfNonFungibleType() external {

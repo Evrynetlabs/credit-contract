@@ -58,6 +58,7 @@ contract ERC1155MixedFungibleMintable is ERC1155MixedFungible {
             nfOwners[id] = to;
             balances[_type][to] = balances[_type][to].add(1);
             _totalSupply[_type] = _totalSupply[_type].add(1);
+            _totalSupply[id] = _totalSupply[id].add(1);
 
             emit TransferSingle(msg.sender, address(0x0), to, id, 1);
 

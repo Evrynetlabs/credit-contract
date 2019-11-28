@@ -70,7 +70,7 @@ contract TestMintFungible {
         for (uint256 i = 5; i < 10; ++i) {
             Assert.equal(credit.balanceOf(testAccounts[i], id), 1, "balance of address 5 - 10 of each credit should be 1"); 
         }
-        Assert.equal(credit.totalSupply(id), 10, "total supply of fungible type should be 10");
+        Assert.equal(credit.totalSupply(id), 10, "total supply of fungible credit type should be 10");
     }
 
     function testWhenTypeIsNotFungible() external {

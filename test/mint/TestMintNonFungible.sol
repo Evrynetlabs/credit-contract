@@ -47,9 +47,9 @@ contract TestMintNonFungible {
 
         for (uint256 i = 0; i < 10; ++i) {
             Assert.equal(credit.balanceOf(testAccounts[i], contractType + i + 1), 1, "balance of address 5 - 10 of each credit should be 1"); 
-            Assert.equal(credit.totalSupply(contractType + i + 1), 10, "total supply of non fungible id should be 10");
+            Assert.equal(credit.totalSupply(contractType + i + 1), 1, "total supply of non fungible credit id should be 1");
         }
-        Assert.equal(credit.totalSupply(contractType), 10, "total supply of non fungible type should be 10");
+        Assert.equal(credit.totalSupply(contractType), 10, "total supply of non fungible credit type should be 10");
     }
 
     function testWhenMinterHasNoPermission() external {
@@ -77,7 +77,8 @@ contract TestMintNonFungible {
 
         Assert.isTrue(result, "should pass creatorOnly modifier");
         Assert.equal(credit.balanceOf(testAccounts[0], contractType + 1), 1, "balance should be equal to 1");
-        Assert.equal(credit.totalSupply(contractType + 1), 1, "total supply of non fungible type should be equal to 1");
+        Assert.equal(credit.totalSupply(contractType + 1), 1, "total supply of non fungible credit id should be equal to 1");
+        Assert.equal(credit.totalSupply(contractType), 1, "total supply of non fungible credit type should be equal to 1");
     }
 
     function testWhenNotImplementOnERC1155Received() external {

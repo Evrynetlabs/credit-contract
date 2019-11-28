@@ -66,6 +66,7 @@ contract ERC1155e is IERC1155e, ERC1155MixedFungibleMintable {
         nfOwners[_id] = address(0);
         balances[_type][msg.sender] = balances[_type][msg.sender].sub(1);
         _totalSupply[_type] = _totalSupply[_type].sub(1);
+        _totalSupply[_id] = _totalSupply[_id].sub(1);
 
         emit TransferSingle(msg.sender, msg.sender, address(0), _id, 1);
     }
@@ -104,11 +105,6 @@ contract ERC1155e is IERC1155e, ERC1155MixedFungibleMintable {
         @return        The total supply of the Token type requested
      */
     function totalSupply(uint256 _id) view external returns(uint256) {
-        if (isNonFungible(_id)) {
-            uint256 _type = getNonFungibleBaseType(_id);
-            return _totalSupply[_type];
-        } else {
             return _totalSupply[_id];
-        }
     }
 }

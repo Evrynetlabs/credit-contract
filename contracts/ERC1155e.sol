@@ -24,6 +24,7 @@ contract ERC1155e is IERC1155e, ERC1155MixedFungibleMintable {
         @param _tos      List of Target addresses
         @param _ids      List of ID of the credit types
         @param _values   List of Transfer amounts
+        @param _data     Data sending to event logs
     */
     function safeFullBatchTransferFrom(address[] calldata _froms, address[] calldata _tos, uint256[] calldata _ids,
                                    uint256[] calldata _values, bytes calldata _data) external {

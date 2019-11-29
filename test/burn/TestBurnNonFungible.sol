@@ -58,7 +58,7 @@ contract TestBurnNonFungible {
       Assert.isTrue(result, "should pass since credit is fungible");
       Assert.equal(credit.balanceOf(testAccounts[0], contractType), 0, "the balance of this credit id/type after being burned should be 0");
       Assert.equal(credit.balanceOf(testAccounts[0], contractType + 1), 0, "the balance of this credit id/type after being burned should be 0");
-      Assert.equal(credit.totalSupply(contractType), 0, "the total supply of this credit type after being burned shouldn't have non-fungible credit");
-      Assert.equal(credit.totalSupply(contractType + 1), 0, "the total supply of this credit id after being burned shouldn't have non-fungible credit");
+      Assert.equal(credit.totalSupply(contractType), 0, "the total supply of non-fungible credit type should be decreased");
+      Assert.equal(credit.totalSupply(contractType + 1), 0, "the total supply of non-fungible credit id should be decreased");
     }
 }

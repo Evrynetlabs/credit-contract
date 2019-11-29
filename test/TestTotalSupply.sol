@@ -37,14 +37,14 @@ contract TestTotalSupply {
     function testTotalSupplyOfFungibleType() external {
         uint256 fungibleCreditID = prepareFungible();
 
-        Assert.equal(initialCreditBalance, credit.totalSupply(fungibleCreditID), "total supply of fungible credit type should be equal to the expected total amount");
+        Assert.equal(initialCreditBalance, credit.totalSupply(fungibleCreditID), "the total supply of fungible credit type should be equal to the expected total amount");
     }
 
     function testTotalSupplyOfNonFungibleType() external {
         uint256 nonFungibleCreditType = prepareNonFungible();
         uint256 nonFungibleCreditID = nonFungibleCreditType + 1;
 
-        Assert.equal(1, credit.totalSupply(nonFungibleCreditType), "total supply should have a non-fungible credit type");
-        Assert.equal(1, credit.totalSupply(nonFungibleCreditID), "total supply should have a non-fungible credit id");
+        Assert.equal(1, credit.totalSupply(nonFungibleCreditType), "the total supply of non-fungible credit type should be equal to the expected total amount");
+        Assert.equal(1, credit.totalSupply(nonFungibleCreditID), "the total supply of non-fungible credit id should be equal to the expected total amount");
     }
 }

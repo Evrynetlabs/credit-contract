@@ -11,10 +11,10 @@ contract TestValidParameters {
     uint256[] private values;
     address[] private tos;
     address[] private senders;
-    PayableThrowProxy private balanceOwnerProxy;
+    PayableThrowProxy private creditOwnerProxy;
     PayableThrowProxy private receiverProxy;
     PayableThrowProxy private senderProxy;
-    ERC1155e private balanceOwner;
+    ERC1155e private creditOwner;
     ERC1155e private receiverContract;
     ERC1155e private sender;
     bool private result;
@@ -46,16 +46,16 @@ contract TestValidParameters {
         senders = new address[](0);
         ids = new uint256[](0);
         values = new uint256[](0);
-        balanceOwnerProxy = new PayableThrowProxy(address(credit));
-        balanceOwner = ERC1155e(address(balanceOwnerProxy));
+        creditOwnerProxy = new PayableThrowProxy(address(credit));
+        creditOwner = ERC1155e(address(creditOwnerProxy));
         receiverProxy = new PayableThrowProxy(address(credit));
         receiverContract = ERC1155e(address(receiverProxy));
         senderProxy = new PayableThrowProxy(address(credit));
         sender = ERC1155e(address(senderProxy));
-        balanceOwner.setApprovalForAll(address(sender), true);
-        (result, ) = balanceOwnerProxy.execute();
+        creditOwner.setApprovalForAll(address(sender), true);
+        (result, ) = creditOwnerProxy.execute();
         Assert.isTrue(result, "balance owner should successfully approve receiverContract as an operator");
-        Assert.isTrue(credit.isApprovedForAll(address(balanceOwner), address(sender)), "sender should be an operator of balance owner");
+        Assert.isTrue(credit.isApprovedForAll(address(creditOwner), address(sender)), "sender should be an operator of balance owner");
     }
 
     function fillUpMintNonFungible() internal {
@@ -87,7 +87,7 @@ contract TestValidParameters {
         tos.push(address(receiverContract));
     }
 
-    function fillUpToAddress() internal {
+    function fillUpToEOA() internal {
         tos.push(receiverAccountAddr);
     }
 
@@ -96,7 +96,7 @@ contract TestValidParameters {
     }
 
     function fillUpSenderOperator() internal {
-        senders.push(address(balanceOwner));
+        senders.push(address(creditOwner));
     }
 
     function fillUpValue() internal {
@@ -111,7 +111,7 @@ contract TestValidParameters {
     function fillUpSenderFromSendNonfungibleToAddress() internal {
         fillUpValue();
         fillUpSenderFrom();
-        fillUpToAddress();
+        fillUpToEOA();
         fillUpCreateNonFungible();
         fillUpMintNonFungible();
     }
@@ -133,7 +133,7 @@ contract TestValidParameters {
     function fillUpSenderFromSendFungibleToAddress() internal {
         fillUpValue();
         fillUpSenderFrom();
-        fillUpToAddress();
+        fillUpToEOA();
         fillUpCreateFungible();
         fillUpMintFungible();
     }
@@ -157,7 +157,7 @@ contract TestValidParameters {
     function fillUpSenderOperatorSendNonfungibleToAddress() internal {
         fillUpValue();
         fillUpSenderOperator();
-        fillUpToAddress();
+        fillUpToEOA();
         fillUpCreateNonFungible();
         fillUpMintNonFungible();
     }
@@ -179,7 +179,7 @@ contract TestValidParameters {
     function fillUpSenderOperatorSendFungibleToAddress() internal {
         fillUpValue();
         fillUpSenderOperator();
-        fillUpToAddress();
+        fillUpToEOA();
         fillUpCreateFungible();
         fillUpMintFungible();
     }
@@ -224,10 +224,10 @@ contract TestValidParameters {
         Assert.equal(credit.balanceOf(address(sender), ids[1]), 0, "balance of non fungible credit id[1] of the sender should be 0");
         Assert.equal(credit.balanceOf(address(sender), ids[2]), expectedFungibleQuantityLeft, "balance of fungible credit id[2] of the sender should be 0");
         Assert.equal(credit.balanceOf(address(sender), ids[3]), expectedFungibleQuantityLeft, "balance of fungible credit id[3] of the sender should be 0");
-        Assert.equal(credit.balanceOf(address(balanceOwner), ids[4]), 0, "balance of non fungible credit id[4] of the sender (with approval from balance owner) should be 0");
-        Assert.equal(credit.balanceOf(address(balanceOwner), ids[5]), 0, "balance of non fungible credit id[5] of the sender (with approval from balance owner) should be 0");
-        Assert.equal(credit.balanceOf(address(balanceOwner), ids[6]), expectedFungibleQuantityLeft, "balance of fungible credit id[6] of the sender (with approval from balance owner) should be 0");
-        Assert.equal(credit.balanceOf(address(balanceOwner), ids[7]), expectedFungibleQuantityLeft, "balance of fungible credit id[7] of the sender (with approval from balance owner) should be 0");
+        Assert.equal(credit.balanceOf(address(creditOwner), ids[4]), 0, "balance of non fungible credit id[4] of the sender (with approval from balance owner) should be 0");
+        Assert.equal(credit.balanceOf(address(creditOwner), ids[5]), 0, "balance of non fungible credit id[5] of the sender (with approval from balance owner) should be 0");
+        Assert.equal(credit.balanceOf(address(creditOwner), ids[6]), expectedFungibleQuantityLeft, "balance of fungible credit id[6] of the sender (with approval from balance owner) should be 0");
+        Assert.equal(credit.balanceOf(address(creditOwner), ids[7]), expectedFungibleQuantityLeft, "balance of fungible credit id[7] of the sender (with approval from balance owner) should be 0");
         /**
             balance assertion of receiver as contract and account address
         */

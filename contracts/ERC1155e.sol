@@ -69,6 +69,8 @@ contract ERC1155e is IERC1155e, ERC1155MixedFungibleMintable {
         uint256 _type = this.getNonFungibleBaseType(_id);
         nfOwners[_id] = address(0);
         balances[_type][msg.sender] = balances[_type][msg.sender].sub(1);
+        totalSupplies[_type] = totalSupplies[_type].sub(1);
+        totalSupplies[_id] = totalSupplies[_id].sub(1);
 
         emit TransferSingle(msg.sender, msg.sender, address(0), _id, 1);
     }
@@ -83,6 +85,7 @@ contract ERC1155e is IERC1155e, ERC1155MixedFungibleMintable {
         require(isFungible(_id));
         
         balances[_id][msg.sender] = balances[_id][msg.sender].sub(_quantities);
+        totalSupplies[_id] = totalSupplies[_id].sub(_quantities);
 
         emit TransferSingle(msg.sender, msg.sender, address(0), _id, _quantities);
     }
@@ -106,11 +109,6 @@ contract ERC1155e is IERC1155e, ERC1155MixedFungibleMintable {
         @return        The total supply of the Token type requested
      */
     function totalSupply(uint256 _id) view external returns(uint256) {
-        if (isNonFungible(_id)) {
-            uint256 _type = getNonFungibleBaseType(_id);
-            return maxIndex[_type] + 1;
-        } else {
-            return balances[_id][address(0x0)];
-        }
+            return totalSupplies[_id];
     }
 }

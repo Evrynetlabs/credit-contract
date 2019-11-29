@@ -131,6 +131,20 @@ contract TestInvalidParameters {
         senders.push(address(proxyCredit));
     }
 
+    function fillUpNonExistingNonFungibleCreditParams() internal {
+        uint256 _id = createNonFungibleCredit() + 1;
+        ids.push(createFungibleCredit());
+        ids.push(_id);
+        values.push(defaultQuantity);
+        values.push(1);
+        tos.push(address(1));
+        tos.push(address(1));
+        quantities.push(defaultQuantity);
+        senders.push(address(proxyCredit));
+        credit.mintFungible(ids[0], senders, quantities);
+        senders.push(address(proxyCredit));
+    }
+
     function executeSafeFullBatchTransferFrom() internal returns (bool _result) {
         proxyCredit.safeFullBatchTransferFrom(senders, tos, ids, values, data);
         (_result, ) = throwProxy.execute();
@@ -191,5 +205,12 @@ contract TestInvalidParameters {
         result = executeSafeFullBatchTransferFrom();
         Assert.isFalse(result, "should not pass since to is a contract with no token receiver interface");
         Assert.equal(credit.balanceOf(address(proxyCredit), ids[0]), 1, "balance of the balance owner should be the same after reverted");
+    }
+
+    function testNonFungibleWhenCreditIsNotExisted() external {
+        fillUpNonExistingNonFungibleCreditParams();
+        result = executeSafeFullBatchTransferFrom();
+        Assert.isFalse(result, "should not pass since to is a contract with no token receiver interface");
+        Assert.equal(credit.balanceOf(address(proxyCredit), ids[0]), defaultQuantity, "balance of the balance owner should be the same after reverted");
     }
 }

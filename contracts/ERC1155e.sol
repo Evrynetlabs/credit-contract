@@ -24,6 +24,7 @@ contract ERC1155e is IERC1155e, ERC1155MixedFungibleMintable {
         @param _tos      List of Target addresses
         @param _ids      List of ID of the credit types
         @param _values   List of Transfer amounts
+        @param _data     Data sending to event logs
     */
     function safeFullBatchTransferFrom(address[] calldata _froms, address[] calldata _tos, uint256[] calldata _ids,
                                    uint256[] calldata _values, bytes calldata _data) external {
@@ -40,7 +41,10 @@ contract ERC1155e is IERC1155e, ERC1155MixedFungibleMintable {
             require(from == msg.sender || operatorApproval[from][msg.sender] == true, "Credit: Need operator approval for 3rd party transfers.");
             if (isNonFungible(id)) {
                 require(nfOwners[id] == from);
+                uint256 baseType = getNonFungibleBaseType(id);
                 nfOwners[id] = to;
+                balances[baseType][from] = balances[baseType][from].sub(1);
+                balances[baseType][to]   = balances[baseType][to].add(1);
             } else {
                 balances[id][from] = balances[id][from].sub(value);
                 balances[id][to]   = value.add(balances[id][to]);
@@ -50,7 +54,7 @@ contract ERC1155e is IERC1155e, ERC1155MixedFungibleMintable {
             }
         }
 
-        emit TransferFullBatch(msg.sender, _froms, _tos, _ids, _values);
+        emit TransferFullBatch(msg.sender, _froms, _tos, _ids, _values, _data);
     }
 
     /**

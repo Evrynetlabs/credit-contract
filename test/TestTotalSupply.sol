@@ -44,7 +44,7 @@ contract TestTotalSupply {
         uint256 nonFungibleCreditType = prepareNonFungible();
         uint256 nonFungibleCreditID = nonFungibleCreditType + 1;
 
-        Assert.equal(1, credit.totalSupply(nonFungibleCreditType), "total supply of non fungible credit type should be 1");
-        Assert.equal(1, credit.totalSupply(nonFungibleCreditID), "total supply of non fungible credit id should be 1");
+        Assert.equal(1, credit.totalSupply(nonFungibleCreditType), "total supply should have a non-fungible credit type");
+        Assert.equal(1, credit.totalSupply(nonFungibleCreditID), "total supply should have a non-fungible credit id");
     }
 }

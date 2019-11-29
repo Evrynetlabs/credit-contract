@@ -11,7 +11,7 @@ contract ERC1155MixedFungibleMintable is ERC1155MixedFungible {
     uint256 nonce;
     mapping (uint256 => address) public minters;
     mapping (uint256 => uint256) public maxIndex;
-    mapping (uint256 => uint256) public _totalSupply;
+    mapping (uint256 => uint256) public totalSupplies;
 
     modifier minterOnly(uint256 _id) {
         require(minters[_id] == msg.sender);
@@ -57,8 +57,8 @@ contract ERC1155MixedFungibleMintable is ERC1155MixedFungible {
 
             nfOwners[id] = to;
             balances[_type][to] = balances[_type][to].add(1);
-            _totalSupply[_type] = _totalSupply[_type].add(1);
-            _totalSupply[id] = _totalSupply[id].add(1);
+            totalSupplies[_type] = totalSupplies[_type].add(1);
+            totalSupplies[id] = totalSupplies[id].add(1);
 
             emit TransferSingle(msg.sender, address(0x0), to, id, 1);
 
@@ -80,7 +80,7 @@ contract ERC1155MixedFungibleMintable is ERC1155MixedFungible {
 
             // Grant the items to the caller
             balances[_id][to] = quantity.add(balances[_id][to]);
-            _totalSupply[_id] = _totalSupply[_id].add(quantity);
+            totalSupplies[_id] = totalSupplies[_id].add(quantity);
 
             // Emit the Transfer/Mint event.
             // the 0x0 source address implies a mint

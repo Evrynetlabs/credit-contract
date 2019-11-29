@@ -57,7 +57,7 @@ contract TestBurnFungible {
       (result, ) = throwProxy.execute();
       Assert.isTrue(result, "should pass since credit is fungible");
       Assert.equal(credit.balanceOf(testAccounts[0], id), 0, "the balance of this credit id/type after being burned should be 0");
-      Assert.equal(credit.totalSupply(id), 0, "the total supply of this credit id/type after being burned should be 0");
+      Assert.equal(credit.totalSupply(id), 0, "the total supply of this credit id/type after being burned should be decreased");
     }
 
     function testWhenInsufficientCredit() external {

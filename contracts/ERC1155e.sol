@@ -54,7 +54,7 @@ contract ERC1155e is IERC1155e, ERC1155MixedFungibleMintable {
             }
         }
 
-        emit TransferFullBatch(msg.sender, _froms, _tos, _ids, _values);
+        emit TransferFullBatch(msg.sender, _froms, _tos, _ids, _values, _data);
     }
 
     /**

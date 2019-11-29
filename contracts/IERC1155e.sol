@@ -2,7 +2,16 @@ pragma solidity ^0.5.0;
 
 interface IERC1155e /* is ERC1155MixedFungibleMintable, IERC1155Metadata */ {
 
-    event TransferFullBatch(address indexed _operator, address[] indexed _froms, address[] indexed _tos, uint256[] _ids, uint256[] _values);
+    /**
+        @dev Either `TransferFullBatch` MUST emit when tokens are transferred using full batch transfer.
+        The `_operator` argument MUST be msg.sender.
+        The `_froms` argument MUST be the addresses of the holder whose balance is decreased.
+        The `_tos` argument MUST be the addresses of the recipient whose balance is increased.
+        The `_ids` argument MUST be the list of tokens being transferred.
+        The `_values` argument MUST be the list of number of tokens (matching the list and order of tokens specified in _ids) the holder balance is decreased by and match what the recipient balance is increased by.
+        The `_key` argument MUST be a data or key for indexing the event log.
+    */
+    event TransferFullBatch(address indexed _operator, address[] _froms, address[] _tos, uint256[] _ids, uint256[] _values, bytes indexed _key);
     event Create(uint256 indexed _id, address _creator);
     event SetMinter(uint256 indexed _type, address _minter);
 

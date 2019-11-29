@@ -188,7 +188,6 @@ contract TestInvalidParameters {
         fillUpSenderIsNotTheOwnerOfCreditParams();
         result = executeSafeFullBatchTransferFrom();
         Assert.isFalse(result, "should not pass since to is a contract with no token receiver interface");
-        Assert.equal(credit.balanceOf(address(proxyCredit), ids[0]), defaultQuantity, "balance of the balance owner should be the same after reverted");
     }
 
     // **************** Fungible Case ********************
@@ -197,20 +196,17 @@ contract TestInvalidParameters {
         fillUpInsufficientAmountParams();
         result = executeSafeFullBatchTransferFrom();
         Assert.isFalse(result, "should not pass since to is a contract with no token receiver interface");
-        Assert.equal(credit.balanceOf(address(proxyCredit), ids[0]), 1, "balance of the balance owner should be the same after reverted");
     }
 
     function testFungibleWhenCreditIsNotExisted() external {
         fillUpNonExistingFungibleCreditParams();
         result = executeSafeFullBatchTransferFrom();
         Assert.isFalse(result, "should not pass since to is a contract with no token receiver interface");
-        Assert.equal(credit.balanceOf(address(proxyCredit), ids[0]), 1, "balance of the balance owner should be the same after reverted");
     }
 
     function testNonFungibleWhenCreditIsNotExisted() external {
         fillUpNonExistingNonFungibleCreditParams();
         result = executeSafeFullBatchTransferFrom();
         Assert.isFalse(result, "should not pass since to is a contract with no token receiver interface");
-        Assert.equal(credit.balanceOf(address(proxyCredit), ids[0]), defaultQuantity, "balance of the balance owner should be the same after reverted");
     }
 }

@@ -1,17 +1,19 @@
 pragma solidity ^0.5.0;
 
 import "./ERC1155MixedFungible.sol";
+import "./IERC1155Metadata.sol";
 
 /**
     @dev Mintable form of ERC1155
     Shows how easy it is to mint new items
 */
-contract ERC1155MixedFungibleMintable is ERC1155MixedFungible {
+contract ERC1155MixedFungibleMintable is ERC1155MixedFungible, IERC1155Metadata {
 
     uint256 nonce;
     mapping (uint256 => address) public minters;
     mapping (uint256 => uint256) public maxIndex;
     mapping (uint256 => uint256) public totalSupplies;
+    mapping (uint256 => string) public metalinks;
 
     modifier minterOnly(uint256 _id) {
         require(minters[_id] == msg.sender);
@@ -38,6 +40,7 @@ contract ERC1155MixedFungibleMintable is ERC1155MixedFungible {
         emit TransferSingle(msg.sender, address(0x0), address(0x0), _type, 0);
 
         if (bytes(_metalink).length > 0)
+            metalinks[_type] = _metalink;
             emit URI(_metalink, _type);
     }
 
@@ -91,5 +94,9 @@ contract ERC1155MixedFungibleMintable is ERC1155MixedFungible {
                 _doSafeTransferAcceptanceCheck(msg.sender, msg.sender, to, _id, quantity, '');
             }
         }
+    }
+
+    function uri(uint256 _id) external view returns (string memory) {
+        return metalinks[_id];
     }
 }

@@ -20,6 +20,7 @@ contract TestCreateCredit {
         Assert.isTrue(credit.isFungible(expectedID), "credit type should be non-fundgible");
         Assert.equal(actualID, expectedID, "ID from create function should be equal to expected ID");
         Assert.equal(credit.minters(actualID), address(this), "address creator should be this contract address");
+        Assert.equal(credit.uri(actualID),expectedURI,"metalink should be equal to expected URI");
     }
 
     function testCreateNFTypes() external {
@@ -30,5 +31,6 @@ contract TestCreateCredit {
         Assert.isTrue(credit.isNonFungible(expectedID), "credit type should be non-fundgible");
         Assert.equal(actualID, expectedID, "ID from create function should be equal to expected ID");
         Assert.equal(credit.minters(actualID), address(this), "address creator should be this contract address");
+        Assert.equal(credit.uri(actualID),expectedURI,"metalink should be equal to expected URI");
     }
 }

@@ -76,17 +76,11 @@ contract TestSafeBatchTransferError {
         proxyCredit.safeBatchTransferFrom(address(proxyCredit), address(2), ids, values, data);
         (result, ) = throwProxy.execute();
         Assert.isFalse(result, "should not pass since insufficient amount");
-        Assert.equal(credit.balanceOf(address(proxyCredit), ids[0]), 1, "balance of the balance owner should be the same after reverted");
-        Assert.equal(credit.balanceOf(address(proxyCredit), ids[0] - 1), 1, "balance of the balance owner should be the same after reverted");
-        Assert.equal(credit.balanceOf(address(proxyCredit), ids[1]), 1, "balance of the balance owner should be the same after reverted");
     }
 
     function testWhenDestinationNotImplementOnERC1155BatchReceived() external {
         proxyCredit.safeBatchTransferFrom(address(proxyCredit), address(this), ids, values, data);
         (result, ) = throwProxy.execute();
         Assert.isFalse(result, "should not pass since the destination does not implement OnERC1155BatchReceived");
-        Assert.equal(credit.balanceOf(address(proxyCredit), ids[0]), 1, "balance of the balance owner should be the same after reverted");
-        Assert.equal(credit.balanceOf(address(proxyCredit), ids[0] - 1), 1, "balance of the balance owner should be the same after reverted");
-        Assert.equal(credit.balanceOf(address(proxyCredit), ids[1]), 1, "balance of the balance owner should be the same after reverted");
     }
 }

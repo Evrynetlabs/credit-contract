@@ -62,12 +62,6 @@ contract TestErrorTransferCredit {
         ERC1155e(operatorAccount).safeTransferFrom(fooAccount, barAccount, fungibleCreditID, 1, bytes(""));
         (success, ) = operatorAccountProxy.execute();
         Assert.isFalse(success, "should throw error operator transfers to zero address");
-
-        uint256 remainingFooAccountBalance = credit.balanceOf(fooAccount, fungibleCreditID);
-        uint256 remainingBarAccountBalance = credit.balanceOf(barAccount, fungibleCreditID);
-
-        Assert.equal(initialCreditBalance, remainingFooAccountBalance, "foo account balance should not decreased");
-        Assert.equal(0, remainingBarAccountBalance, "bar account balance should not increased");
     }
 
     function testErrorUnauthorizedOperator() external {
@@ -78,12 +72,6 @@ contract TestErrorTransferCredit {
         ERC1155e(operatorAccount).safeTransferFrom(fooAccount, barAccount, fungibleCreditID, transferringAmount, bytes(""));
         (bool success, ) = operatorAccountProxy.execute();
         Assert.isFalse(success, "should throw error no transfer permission");
-
-        uint256 remainingFooAccountBalance = credit.balanceOf(fooAccount, fungibleCreditID);
-        uint256 remainingBarAccountBalance = credit.balanceOf(barAccount, fungibleCreditID);
-
-        Assert.equal(initialCreditBalance, remainingFooAccountBalance, "foo account balance should not decreased");
-        Assert.equal(0, remainingBarAccountBalance, "bar account balance should not increased");
     }
 
     function testErrorTransferNonFungibleCreditWithoutOwnership() external {
@@ -92,11 +80,6 @@ contract TestErrorTransferCredit {
         address barAccount = address(1);
         prepareOperator(true);
 
-        uint256 initialFooAccountTypeBalance = credit.balanceOf(fooAccount, nonFungibleCreditType);
-        uint256 initialBarAccountTypeBalance = credit.balanceOf(barAccount, nonFungibleCreditType);
-        uint256 initialFooAccountBalance = credit.balanceOf(fooAccount, nonFungibleCreditID);
-        uint256 initialBarAccountBalance = credit.balanceOf(barAccount, nonFungibleCreditID);
-
         ERC1155e(fooAccount).safeTransferFrom(fooAccount, barAccount, nonFungibleCreditID, 1, bytes(""));
         (bool success, ) = fooAccountProxy.execute();
         Assert.isFalse(success, "should throw error transfer without ownership");
@@ -104,16 +87,6 @@ contract TestErrorTransferCredit {
         ERC1155e(operatorAccount).safeTransferFrom(fooAccount, barAccount, nonFungibleCreditID, 1, bytes(""));
         (success, ) = operatorAccountProxy.execute();
         Assert.isFalse(success, "should throw error transfer without ownership via operator");
-
-        uint256 remainingFooAccountTypeBalance = credit.balanceOf(fooAccount, nonFungibleCreditType);
-        uint256 remainingBarAccountTypeBalance = credit.balanceOf(barAccount, nonFungibleCreditType);
-        uint256 remainingFooAccountBalance = credit.balanceOf(fooAccount, nonFungibleCreditID);
-        uint256 remainingBarAccountBalance = credit.balanceOf(barAccount, nonFungibleCreditID);
-
-        Assert.equal(initialFooAccountTypeBalance, remainingFooAccountTypeBalance, "balance of non fungible credit type of the foo account should not decreased");
-        Assert.equal(initialBarAccountTypeBalance, remainingBarAccountTypeBalance, "balance of non fungible credit type of the bar account should not increased");
-        Assert.equal(initialFooAccountBalance, remainingFooAccountBalance, "foo account balance should not decreased");
-        Assert.equal(initialBarAccountBalance, remainingBarAccountBalance, "bar account balance should not increased");
     }
 
     function testErrorTransferCreditToNotSupportedContract() external {
@@ -128,12 +101,6 @@ contract TestErrorTransferCredit {
         ERC1155e(operatorAccount).safeTransferFrom(fooAccount, barContract, fungibleCreditID, 1, bytes(""));
         (success, ) = operatorAccountProxy.execute();
         Assert.isFalse(success, "should throw error operator transfers to not supported contract");
-
-        uint256 remainingFooAccountBalance = credit.balanceOf(fooAccount, fungibleCreditID);
-        uint256 remainingBarAccountBalance = credit.balanceOf(barContract, fungibleCreditID);
-
-        Assert.equal(initialCreditBalance, remainingFooAccountBalance, "foo account balance should not decreased");
-        Assert.equal(0, remainingBarAccountBalance, "bar account balance should not increased");
     }
 
     function testErrorTransferCreditInsufficientAmount() external {
@@ -144,11 +111,5 @@ contract TestErrorTransferCredit {
         ERC1155e(fooAccount).safeTransferFrom(fooAccount, barAccount, fungibleCreditID, overTransferringAmount, bytes(""));
         (bool success, ) = fooAccountProxy.execute();
         Assert.isFalse(success, "should throw error insufficient amount to transfer fungible credit");
-
-        uint256 remainingFooAccountBalance = credit.balanceOf(fooAccount, fungibleCreditID);
-        uint256 remainingBarAccountBalance = credit.balanceOf(barAccount, fungibleCreditID);
-
-        Assert.equal(initialCreditBalance, remainingFooAccountBalance, "foo account balance should not decreased");
-        Assert.equal(0, remainingBarAccountBalance, "bar account balance should not increased");
     }
 }

@@ -345,7 +345,7 @@ contract EER2A is IEER2A, Common {
         uint256 _value,
         bytes memory _data
     ) internal {
-        // If this was a hybrid standards solution you would have to check ERC165(_to).supportsInterface(0x4e2312e0) here but as this is a pure implementation of an ERC-1155 token set as recommended by
+        // If this was a hybrid standards solution you would have to check ERC165(_to).supportsInterface(0x4e2312e0) here but as this is a pure implementation of an EER-2 token set as recommended by
         // the standard, it is not necessary. The below should revert in all failure cases i.e. _to isn't a receiver, or it is and either returns an unknown value or it reverts in the call to indicate non-acceptance.
 
         // Note: if the below reverts in the onEER2Received function of the _to address you will have an undefined revert reason returned rather than the one in the require test.
@@ -371,7 +371,7 @@ contract EER2A is IEER2A, Common {
         uint256[] memory _values,
         bytes memory _data
     ) internal {
-        // If this was a hybrid standards solution you would have to check ERC165(_to).supportsInterface(0x4e2312e0) here but as this is a pure implementation of an ERC-1155 token set as recommended by
+        // If this was a hybrid standards solution you would have to check ERC165(_to).supportsInterface(0x4e2312e0) here but as this is a pure implementation of an EER-2 token set as recommended by
         // the standard, it is not necessary. The below should revert in all failure cases i.e. _to isn't a receiver, or it is and either returns an unknown value or it reverts in the call to indicate non-acceptance.
 
         // Note: if the below reverts in the onEER2BatchReceived function of the _to address you will have an undefined revert reason returned rather than the one in the require test.

@@ -3,10 +3,10 @@ pragma solidity ^0.5.0;
 import "truffle/Assert.sol";
 import "../utils/ThrowProxy.sol";
 import "../utils/PayableThrowProxy.sol";
-import "../../contracts/ERC1155e.sol";
+import "../../contracts/EER2B.sol";
 
 contract TestErrorTransferCredit {
-    ERC1155e public credit;
+    EER2B public credit;
     PayableThrowProxy private fooAccountProxy;
     ThrowProxy private operatorAccountProxy;
     address private fooAccount;
@@ -15,14 +15,14 @@ contract TestErrorTransferCredit {
     uint256 private transferringAmount = 30;
 
     function beforeEach() external {
-        credit = new ERC1155e();
+        credit = new EER2B();
         fooAccountProxy = new PayableThrowProxy(address(credit));
         fooAccount = address(fooAccountProxy);
         operatorAccountProxy = new ThrowProxy(address(credit));
         operatorAccount = address(operatorAccountProxy);
     }
 
-    function prepareFungible() internal returns(uint256) {
+    function prepareFungible() internal returns (uint256) {
         uint256 fungibleCreditID = credit.create("", false);
 
         address[] memory tos = new address[](1);
@@ -34,7 +34,7 @@ contract TestErrorTransferCredit {
         return fungibleCreditID;
     }
 
-    function prepareNonFungible() internal returns(uint256){
+    function prepareNonFungible() internal returns (uint256) {
         uint256 nonFungibleCreditType = credit.create("", true);
 
         address[] memory tos = new address[](1);
@@ -45,9 +45,12 @@ contract TestErrorTransferCredit {
     }
 
     function prepareOperator(bool approved) internal {
-        ERC1155e(fooAccount).setApprovalForAll(operatorAccount, approved);
+        EER2B(fooAccount).setApprovalForAll(operatorAccount, approved);
         (bool success, ) = fooAccountProxy.execute();
-        Assert.isTrue(success, "should not throw error setting approval to operator");
+        Assert.isTrue(
+            success,
+            "should not throw error setting approval to operator"
+        );
     }
 
     function testErrorTransferCreditToZeroAddress() external {
@@ -55,13 +58,31 @@ contract TestErrorTransferCredit {
         address barAccount = address(0);
         prepareOperator(true);
 
-        ERC1155e(fooAccount).safeTransferFrom(fooAccount, barAccount, fungibleCreditID, 1, bytes(""));
+        EER2B(fooAccount).safeTransferFrom(
+            fooAccount,
+            barAccount,
+            fungibleCreditID,
+            1,
+            bytes("")
+        );
         (bool success, ) = fooAccountProxy.execute();
-        Assert.isFalse(success, "should throw error owner transfers to zero address");
+        Assert.isFalse(
+            success,
+            "should throw error owner transfers to zero address"
+        );
 
-        ERC1155e(operatorAccount).safeTransferFrom(fooAccount, barAccount, fungibleCreditID, 1, bytes(""));
+        EER2B(operatorAccount).safeTransferFrom(
+            fooAccount,
+            barAccount,
+            fungibleCreditID,
+            1,
+            bytes("")
+        );
         (success, ) = operatorAccountProxy.execute();
-        Assert.isFalse(success, "should throw error operator transfers to zero address");
+        Assert.isFalse(
+            success,
+            "should throw error operator transfers to zero address"
+        );
     }
 
     function testErrorUnauthorizedOperator() external {
@@ -69,7 +90,13 @@ contract TestErrorTransferCredit {
         address barAccount = address(1);
         prepareOperator(false);
 
-        ERC1155e(operatorAccount).safeTransferFrom(fooAccount, barAccount, fungibleCreditID, transferringAmount, bytes(""));
+        EER2B(operatorAccount).safeTransferFrom(
+            fooAccount,
+            barAccount,
+            fungibleCreditID,
+            transferringAmount,
+            bytes("")
+        );
         (bool success, ) = operatorAccountProxy.execute();
         Assert.isFalse(success, "should throw error no transfer permission");
     }
@@ -80,13 +107,31 @@ contract TestErrorTransferCredit {
         address barAccount = address(1);
         prepareOperator(true);
 
-        ERC1155e(fooAccount).safeTransferFrom(fooAccount, barAccount, nonFungibleCreditID, 1, bytes(""));
+        EER2B(fooAccount).safeTransferFrom(
+            fooAccount,
+            barAccount,
+            nonFungibleCreditID,
+            1,
+            bytes("")
+        );
         (bool success, ) = fooAccountProxy.execute();
-        Assert.isFalse(success, "should throw error transfer without ownership");
+        Assert.isFalse(
+            success,
+            "should throw error transfer without ownership"
+        );
 
-        ERC1155e(operatorAccount).safeTransferFrom(fooAccount, barAccount, nonFungibleCreditID, 1, bytes(""));
+        EER2B(operatorAccount).safeTransferFrom(
+            fooAccount,
+            barAccount,
+            nonFungibleCreditID,
+            1,
+            bytes("")
+        );
         (success, ) = operatorAccountProxy.execute();
-        Assert.isFalse(success, "should throw error transfer without ownership via operator");
+        Assert.isFalse(
+            success,
+            "should throw error transfer without ownership via operator"
+        );
     }
 
     function testErrorTransferCreditToNotSupportedContract() external {
@@ -94,13 +139,31 @@ contract TestErrorTransferCredit {
         address barContract = address(new ThrowProxy(address(1)));
         prepareOperator(true);
 
-        ERC1155e(fooAccount).safeTransferFrom(fooAccount, barContract, fungibleCreditID, 1, bytes(""));
+        EER2B(fooAccount).safeTransferFrom(
+            fooAccount,
+            barContract,
+            fungibleCreditID,
+            1,
+            bytes("")
+        );
         (bool success, ) = fooAccountProxy.execute();
-        Assert.isFalse(success, "should throw error owner transfers to not supported contract");
+        Assert.isFalse(
+            success,
+            "should throw error owner transfers to not supported contract"
+        );
 
-        ERC1155e(operatorAccount).safeTransferFrom(fooAccount, barContract, fungibleCreditID, 1, bytes(""));
+        EER2B(operatorAccount).safeTransferFrom(
+            fooAccount,
+            barContract,
+            fungibleCreditID,
+            1,
+            bytes("")
+        );
         (success, ) = operatorAccountProxy.execute();
-        Assert.isFalse(success, "should throw error operator transfers to not supported contract");
+        Assert.isFalse(
+            success,
+            "should throw error operator transfers to not supported contract"
+        );
     }
 
     function testErrorTransferCreditInsufficientAmount() external {
@@ -108,8 +171,17 @@ contract TestErrorTransferCredit {
         address barAccount = address(1);
         uint256 overTransferringAmount = 120;
 
-        ERC1155e(fooAccount).safeTransferFrom(fooAccount, barAccount, fungibleCreditID, overTransferringAmount, bytes(""));
+        EER2A(fooAccount).safeTransferFrom(
+            fooAccount,
+            barAccount,
+            fungibleCreditID,
+            overTransferringAmount,
+            bytes("")
+        );
         (bool success, ) = fooAccountProxy.execute();
-        Assert.isFalse(success, "should throw error insufficient amount to transfer fungible credit");
+        Assert.isFalse(
+            success,
+            "should throw error insufficient amount to transfer fungible credit"
+        );
     }
 }

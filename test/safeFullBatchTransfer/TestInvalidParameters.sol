@@ -2,12 +2,11 @@ pragma solidity ^0.5.0;
 
 import "truffle/Assert.sol";
 import "truffle/DeployedAddresses.sol";
-import "../../contracts/ERC1155e.sol";
+import "../../contracts/EER2B.sol";
 import "../utils/PayableThrowProxy.sol";
 
 contract TestInvalidParameters {
-
-    ERC1155e private credit;
+    EER2B private credit;
     string private uri;
     uint256[] private ids;
     uint256[] private values;
@@ -15,7 +14,7 @@ contract TestInvalidParameters {
     address[] private senders;
     uint256[] private quantities;
     PayableThrowProxy private throwProxy;
-    ERC1155e private proxyCredit;
+    EER2B private proxyCredit;
     bytes private data;
     bool private result;
     uint256 private defaultQuantity = 100;
@@ -33,7 +32,7 @@ contract TestInvalidParameters {
     }
 
     function setupTest() internal {
-        credit = new ERC1155e();
+        credit = new EER2B();
         uri = "foo";
         result = false;
         data = "data";
@@ -43,7 +42,7 @@ contract TestInvalidParameters {
         ids = new uint256[](0);
         values = new uint256[](0);
         throwProxy = new PayableThrowProxy(address(credit));
-        proxyCredit = ERC1155e(address(throwProxy));
+        proxyCredit = EER2B(address(throwProxy));
     }
 
     function fillUpInvalidParametersLengthParams() internal {
@@ -145,13 +144,16 @@ contract TestInvalidParameters {
         senders.push(address(proxyCredit));
     }
 
-    function executeSafeFullBatchTransferFrom() internal returns (bool _result) {
+    function executeSafeFullBatchTransferFrom()
+        internal
+        returns (bool _result)
+    {
         proxyCredit.safeFullBatchTransferFrom(senders, tos, ids, values, data);
         (_result, ) = throwProxy.execute();
     }
 
     // ********************************************* External Function *********************************************
-    
+
     function beforeEach() external {
         setupTest();
     }
@@ -161,7 +163,10 @@ contract TestInvalidParameters {
     function testInvalidParametersLength() external {
         fillUpInvalidParametersLengthParams();
         result = executeSafeFullBatchTransferFrom();
-        Assert.isFalse(result, "should not pass since parameters contain invalid length");
+        Assert.isFalse(
+            result,
+            "should not pass since parameters contain invalid length"
+        );
     }
 
     function testTransferToAddressZero() external {
@@ -179,7 +184,10 @@ contract TestInvalidParameters {
     function testWhenToIsContractWithNoTokenReceiverInterface() external {
         fillUpToIsContractWithNoTokenReceiverParams();
         result = executeSafeFullBatchTransferFrom();
-        Assert.isFalse(result, "should not pass since to is a contract with no token receiver interface");
+        Assert.isFalse(
+            result,
+            "should not pass since to is a contract with no token receiver interface"
+        );
     }
 
     // **************** Non-Fungible Case ****************
@@ -187,7 +195,10 @@ contract TestInvalidParameters {
     function testFungibleWhenSenderIsNotTheOwnerOfCredit() external {
         fillUpSenderIsNotTheOwnerOfCreditParams();
         result = executeSafeFullBatchTransferFrom();
-        Assert.isFalse(result, "should not pass since to is a contract with no token receiver interface");
+        Assert.isFalse(
+            result,
+            "should not pass since to is a contract with no token receiver interface"
+        );
     }
 
     // **************** Fungible Case ********************
@@ -195,18 +206,27 @@ contract TestInvalidParameters {
     function testFungibleWhenInsufficientAmount() external {
         fillUpInsufficientAmountParams();
         result = executeSafeFullBatchTransferFrom();
-        Assert.isFalse(result, "should not pass since to is a contract with no token receiver interface");
+        Assert.isFalse(
+            result,
+            "should not pass since to is a contract with no token receiver interface"
+        );
     }
 
     function testFungibleWhenCreditIsNotExisted() external {
         fillUpNonExistingFungibleCreditParams();
         result = executeSafeFullBatchTransferFrom();
-        Assert.isFalse(result, "should not pass since to is a contract with no token receiver interface");
+        Assert.isFalse(
+            result,
+            "should not pass since to is a contract with no token receiver interface"
+        );
     }
 
     function testNonFungibleWhenCreditIsNotExisted() external {
         fillUpNonExistingNonFungibleCreditParams();
         result = executeSafeFullBatchTransferFrom();
-        Assert.isFalse(result, "should not pass since to is a contract with no token receiver interface");
+        Assert.isFalse(
+            result,
+            "should not pass since to is a contract with no token receiver interface"
+        );
     }
 }

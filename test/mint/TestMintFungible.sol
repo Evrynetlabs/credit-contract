@@ -2,23 +2,22 @@ pragma solidity ^0.5.0;
 
 import "truffle/Assert.sol";
 import "truffle/DeployedAddresses.sol";
-import "../../contracts/ERC1155e.sol";
+import "../../contracts/EER2B.sol";
 import "../utils/PayableThrowProxy.sol";
 
 contract TestMintFungible {
-
-    ERC1155e private credit;
+    EER2B private credit;
     address[] private testAccounts;
     uint256[] private quantities;
     bool private isNF;
     bool private result;
     uint256 private id;
-    ERC1155e private proxyCredit;
+    EER2B private proxyCredit;
     PayableThrowProxy private throwProxy;
     string private uri;
 
     function beforeEach() external {
-        credit = new ERC1155e();
+        credit = new EER2B();
         uri = "foo";
         testAccounts = new address[](0);
         quantities = new uint256[](0);
@@ -28,7 +27,7 @@ contract TestMintFungible {
         testAccounts.push(address(1));
         quantities.push(1);
         throwProxy = new PayableThrowProxy(address(credit));
-        proxyCredit = ERC1155e(address(throwProxy));
+        proxyCredit = EER2B(address(throwProxy));
     }
 
     function testWhenMinterHasNoPermission() external {
@@ -43,10 +42,18 @@ contract TestMintFungible {
         credit.setMinter(id, address(proxyCredit));
         proxyCredit.mintFungible(id, testAccounts, quantities);
         (result, ) = throwProxy.execute();
-        
+
         Assert.isTrue(result, "should successfully minting a credit");
-        Assert.equal(credit.balanceOf(testAccounts[0], id), quantities[0], "balance should be equal to 1");
-        Assert.equal(credit.totalSupply(id), quantities[0], "total supply of fungible type should be equal to the expected quantity");
+        Assert.equal(
+            credit.balanceOf(testAccounts[0], id),
+            quantities[0],
+            "balance should be equal to 1"
+        );
+        Assert.equal(
+            credit.totalSupply(id),
+            quantities[0],
+            "total supply of fungible type should be equal to the expected quantity"
+        );
     }
 
     function testBatch() external {
@@ -65,12 +72,24 @@ contract TestMintFungible {
 
         credit.mintFungible(id, testAccounts, quantities);
 
-        Assert.equal(credit.balanceOf(addr, id), expectedBal, "balance of address 1 should be 5");
+        Assert.equal(
+            credit.balanceOf(addr, id),
+            expectedBal,
+            "balance of address 1 should be 5"
+        );
 
         for (uint256 i = 5; i < 10; ++i) {
-            Assert.equal(credit.balanceOf(testAccounts[i], id), 1, "balance of address 5 - 10 of each credit should be 1"); 
+            Assert.equal(
+                credit.balanceOf(testAccounts[i], id),
+                1,
+                "balance of address 5 - 10 of each credit should be 1"
+            );
         }
-        Assert.equal(credit.totalSupply(id), 10, "the total supply of fungible credit type should be the expected quantity multiply with many test accounts");
+        Assert.equal(
+            credit.totalSupply(id),
+            10,
+            "the total supply of fungible credit type should be the expected quantity multiply with many test accounts"
+        );
     }
 
     function testWhenTypeIsNotFungible() external {
@@ -92,14 +111,17 @@ contract TestMintFungible {
         Assert.isFalse(result, "should not pass length comparison");
     }
 
-    function testWhenNotImplementOnERC1155Received() external {
+    function testWhenNotImplementOnEER2Received() external {
         ThrowProxy _throwProxy = new ThrowProxy(address(credit));
-        ERC1155e _proxyCredit = ERC1155e(address(_throwProxy));
+        EER2B _proxyCredit = EER2B(address(_throwProxy));
         testAccounts[0] = address(_proxyCredit);
         credit.setMinter(id, address(_proxyCredit));
         _proxyCredit.mintFungible(id, testAccounts, quantities);
         (result, ) = _throwProxy.execute();
 
-        Assert.isFalse(result, "should not pass since the contract destination doesn't implement onERC1155Received");
+        Assert.isFalse(
+            result,
+            "should not pass since the contract destination doesn't implement onEER2Received"
+        );
     }
 }

@@ -89,8 +89,8 @@ contract EER2A is IEER2A, Common {
         return balances[_typeID][_owner];
     }
 
-    function metaLink(uint256 _id) external view returns (string memory) {
-        return metalinks[_id];
+    function metaLink(uint256 _typeID) external view returns (string memory) {
+        return metalinks[_typeID];
     }
 
     /**

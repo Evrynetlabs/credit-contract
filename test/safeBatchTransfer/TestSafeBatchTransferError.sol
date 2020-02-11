@@ -8,7 +8,7 @@ import "../utils/PayableThrowProxy.sol";
 contract TestSafeBatchTransferError {
     EER2B private credit;
     string private uri;
-    uint256[] private ids;
+    uint256[] private typeIDs;
     uint256[] private values;
     address[] private testAccounts;
     uint256[] private quantities;
@@ -24,38 +24,38 @@ contract TestSafeBatchTransferError {
         data = "data";
         testAccounts = new address[](0);
         quantities = new uint256[](0);
-        ids = new uint256[](0);
+        typeIDs = new uint256[](0);
         values = new uint256[](0);
         throwProxy = new PayableThrowProxy(address(credit));
         proxyCredit = EER2B(address(throwProxy));
         setup();
     }
 
-    function createNonFungible() internal returns (uint256 _type) {
-        _type = credit.create(uri, true);
+    function createNonFungible() internal returns (uint256 _typeID) {
+        _typeID = credit.create(uri, true);
     }
 
-    function createFungible() internal returns (uint256 _id) {
-        _id = credit.create(uri, false);
+    function createFungible() internal returns (uint256 _typeID) {
+        _typeID = credit.create(uri, false);
     }
 
     function setup() internal {
-        ids.push(createNonFungible());
-        ids.push(createFungible());
+        typeIDs.push(createNonFungible());
+        typeIDs.push(createFungible());
         values.push(1);
         values.push(1);
         testAccounts.push(address(proxyCredit));
         quantities.push(1);
-        credit.mintNonFungible(ids[0], testAccounts);
-        credit.mintFungible(ids[1], testAccounts, quantities);
-        ids[0] += 1;
+        credit.mintNonFungible(typeIDs[0], testAccounts);
+        credit.mintFungible(typeIDs[1], testAccounts, quantities);
+        typeIDs[0] += 1;
     }
 
     function testTransferToAddressZero() external {
         proxyCredit.safeBatchTransferFrom(
             address(credit),
             address(0),
-            ids,
+            typeIDs,
             values,
             data
         );
@@ -68,7 +68,7 @@ contract TestSafeBatchTransferError {
         proxyCredit.safeBatchTransferFrom(
             address(1),
             address(2),
-            ids,
+            typeIDs,
             values,
             data
         );
@@ -83,7 +83,7 @@ contract TestSafeBatchTransferError {
         proxyCredit.safeBatchTransferFrom(
             address(1),
             address(2),
-            ids,
+            typeIDs,
             values,
             data
         );
@@ -99,7 +99,7 @@ contract TestSafeBatchTransferError {
         proxyCredit.safeBatchTransferFrom(
             address(proxyCredit),
             address(2),
-            ids,
+            typeIDs,
             values,
             data
         );
@@ -111,7 +111,7 @@ contract TestSafeBatchTransferError {
         proxyCredit.safeBatchTransferFrom(
             address(proxyCredit),
             address(this),
-            ids,
+            typeIDs,
             values,
             data
         );

@@ -8,7 +8,7 @@ import "../utils/PayableThrowProxy.sol";
 contract TestInvalidParameters {
     EER2B private credit;
     string private uri;
-    uint256[] private ids;
+    uint256[] private typeIDs;
     uint256[] private values;
     address[] private tos;
     address[] private senders;
@@ -23,12 +23,12 @@ contract TestInvalidParameters {
 
     // ********************************************* Internal Function *********************************************
 
-    function createFungibleCredit() internal returns (uint256 _id) {
-        _id = credit.create(uri, false);
+    function createFungibleCredit() internal returns (uint256 _typeID) {
+        _typeID = credit.create(uri, false);
     }
 
-    function createNonFungibleCredit() internal returns (uint256 _type) {
-        _type = credit.create(uri, true);
+    function createNonFungibleCredit() internal returns (uint256 _typeID) {
+        _typeID = credit.create(uri, true);
     }
 
     function setupTest() internal {
@@ -39,108 +39,108 @@ contract TestInvalidParameters {
         tos = new address[](0);
         senders = new address[](0);
         quantities = new uint256[](0);
-        ids = new uint256[](0);
+        typeIDs = new uint256[](0);
         values = new uint256[](0);
         throwProxy = new PayableThrowProxy(address(credit));
         proxyCredit = EER2B(address(throwProxy));
     }
 
     function fillUpInvalidParametersLengthParams() internal {
-        ids.push(createFungibleCredit());
+        typeIDs.push(createFungibleCredit());
         values.push(defaultValue);
         tos.push(address(1));
         tos.push(address(2));
         senders.push(address(proxyCredit));
         quantities.push(defaultQuantity);
-        credit.mintFungible(ids[0], senders, quantities);
+        credit.mintFungible(typeIDs[0], senders, quantities);
     }
 
     function fillUpAddressZeroOnToParams() internal {
-        ids.push(createFungibleCredit());
+        typeIDs.push(createFungibleCredit());
         values.push(defaultValue);
         tos.push(address(0));
         senders.push(address(proxyCredit));
         quantities.push(defaultQuantity);
-        credit.mintFungible(ids[0], senders, quantities);
+        credit.mintFungible(typeIDs[0], senders, quantities);
     }
 
     function fillUpSenderIsNotAuthorizedParams() internal {
-        ids.push(createFungibleCredit());
+        typeIDs.push(createFungibleCredit());
         values.push(defaultValue);
         tos.push(address(1));
         senders.push(address(2));
         quantities.push(defaultQuantity);
-        credit.mintFungible(ids[0], senders, quantities);
+        credit.mintFungible(typeIDs[0], senders, quantities);
     }
 
     function fillUpToIsContractWithNoTokenReceiverParams() internal {
-        ids.push(createFungibleCredit());
+        typeIDs.push(createFungibleCredit());
         values.push(defaultValue);
         tos.push(address(this));
         senders.push(address(proxyCredit));
         quantities.push(defaultQuantity);
-        credit.mintFungible(ids[0], senders, quantities);
+        credit.mintFungible(typeIDs[0], senders, quantities);
     }
 
     function fillUpSenderIsNotTheOwnerOfCreditParams() internal {
-        uint256 _id = createNonFungibleCredit() + 1;
-        uint256 _type = credit.getNonFungibleBaseType(_id);
-        ids.push(createFungibleCredit());
-        ids.push(_id);
+        uint256 _itemID = createNonFungibleCredit() + 1;
+        uint256 _typeID = credit.getNonFungibleBaseType(_itemID);
+        typeIDs.push(createFungibleCredit());
+        typeIDs.push(_typeID);
         values.push(defaultValue);
         values.push(1);
         tos.push(address(1));
         tos.push(address(1));
         quantities.push(defaultQuantity);
         senders.push(address(proxyCredit));
-        credit.mintFungible(ids[0], senders, quantities);
+        credit.mintFungible(typeIDs[0], senders, quantities);
         senders[0] = address(address(2));
-        credit.mintNonFungible(_type, senders);
+        credit.mintNonFungible(_typeID, senders);
         senders.push(address(proxyCredit));
     }
 
     function fillUpInsufficientAmountParams() internal {
-        uint256 _id = createNonFungibleCredit() + 1;
-        uint256 _type = credit.getNonFungibleBaseType(_id);
+        uint256 _itemID = createNonFungibleCredit() + 1;
+        uint256 _typeID = credit.getNonFungibleBaseType(_itemID);
         uint256 overAbundantAmount = defaultQuantity + 1;
-        ids.push(_id);
-        ids.push(createFungibleCredit());
+        typeIDs.push(_itemID);
+        typeIDs.push(createFungibleCredit());
         values.push(1);
         values.push(overAbundantAmount);
         tos.push(address(1));
         tos.push(address(1));
         quantities.push(defaultQuantity);
         senders.push(address(proxyCredit));
-        credit.mintFungible(ids[1], senders, quantities);
-        credit.mintNonFungible(_type, senders);
+        credit.mintFungible(typeIDs[1], senders, quantities);
+        credit.mintNonFungible(_typeID, senders);
         senders.push(address(proxyCredit));
     }
 
     function fillUpNonExistingFungibleCreditParams() internal {
-        uint256 _id = createNonFungibleCredit() + 1;
-        uint256 _type = credit.getNonFungibleBaseType(_id);
-        ids.push(_id);
-        ids.push(createFungibleCredit());
+        uint256 _itemID = createNonFungibleCredit() + 1;
+        uint256 _typeID = credit.getNonFungibleBaseType(_itemID);
+        typeIDs.push(_itemID);
+        typeIDs.push(createFungibleCredit());
         values.push(1);
         values.push(1);
         tos.push(address(1));
         tos.push(address(1));
         senders.push(address(proxyCredit));
-        credit.mintNonFungible(_type, senders);
+        credit.mintNonFungible(_typeID, senders);
         senders.push(address(proxyCredit));
     }
 
     function fillUpNonExistingNonFungibleCreditParams() internal {
-        uint256 _id = createNonFungibleCredit() + 1;
-        ids.push(createFungibleCredit());
-        ids.push(_id);
+        uint256 _itemID = createNonFungibleCredit() + 1;
+        typeIDs.push(createFungibleCredit());
+        typeIDs.push(_itemID);
         values.push(defaultQuantity);
         values.push(1);
         tos.push(address(1));
         tos.push(address(1));
         quantities.push(defaultQuantity);
         senders.push(address(proxyCredit));
-        credit.mintFungible(ids[0], senders, quantities);
+        credit.mintFungible(typeIDs[0], senders, quantities);
         senders.push(address(proxyCredit));
     }
 
@@ -148,7 +148,13 @@ contract TestInvalidParameters {
         internal
         returns (bool _result)
     {
-        proxyCredit.safeFullBatchTransferFrom(senders, tos, ids, values, data);
+        proxyCredit.safeFullBatchTransferFrom(
+            senders,
+            tos,
+            typeIDs,
+            values,
+            data
+        );
         (_result, ) = throwProxy.execute();
     }
 

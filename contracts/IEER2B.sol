@@ -6,9 +6,12 @@ interface IEER2B {
         URIs are defined in RFC 3986.
         The URI MUST point a JSON file that conforms to the "EER-2 Metadata URI JSON Schema".
     */
-    event URI(string _value, uint256 indexed _id);
+    event URI(string _value, uint256 indexed _typeID);
+
+    /**
+        @dev MUST emit when creator authorized to `_minter`. 
+     */
     event SetMinter(uint256 indexed _typeID, address _minter);
-    event Create(uint256 indexed _typeID, address _creator);
 
     /**
         give `_typeID` creator authorized to `_minter`.
@@ -54,14 +57,14 @@ interface IEER2B {
     ) external;
 
     /**
-        Delete `_value` of Credit `_id` from the world.
+        Delete `_value` of Credit `_itemID` from the world.
         @param _itemID  Item of non-fungible credit type
         @param _from Source address
     */
     function burnNonFungible(uint256 _itemID, address _from) external;
 
     /**
-        Delete `_value` of Credit `_id` from the world.
+        Delete `_value` of Credit `_typeID` from the world.
         @param _typeID  Credit type
         @param _value Burn Credit quantities
         @param _from Source address

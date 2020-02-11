@@ -12,7 +12,7 @@ contract TestSetMinter {
     bool private result;
     PayableThrowProxy private throwProxy;
     EER2B private proxyCredit;
-    uint256 id;
+    uint256 typeID;
 
     function beforeEach() external {
         credit = new EER2B();
@@ -21,11 +21,11 @@ contract TestSetMinter {
         result = false;
         throwProxy = new PayableThrowProxy(address(credit));
         proxyCredit = EER2B(address(throwProxy));
-        id = credit.create(uri, isNF);
+        typeID = credit.create(uri, isNF);
     }
 
     function testWhenCallerHasNoPermission() external {
-        proxyCredit.setMinter(id, address(2));
+        proxyCredit.setMinter(typeID, address(2));
         (result, ) = throwProxy.execute();
 
         Assert.isFalse(
@@ -35,8 +35,8 @@ contract TestSetMinter {
     }
 
     function testWhenNewMinterIsCurrentMinter() external {
-        credit.setMinter(id, address(proxyCredit));
-        proxyCredit.setMinter(id, address(proxyCredit));
+        credit.setMinter(typeID, address(proxyCredit));
+        proxyCredit.setMinter(typeID, address(proxyCredit));
         (result, ) = throwProxy.execute();
 
         Assert.isFalse(
@@ -46,8 +46,8 @@ contract TestSetMinter {
     }
 
     function testWhenMinterIsANewMinter() external {
-        credit.setMinter(id, address(proxyCredit));
-        proxyCredit.setMinter(id, address(1));
+        credit.setMinter(typeID, address(proxyCredit));
+        proxyCredit.setMinter(typeID, address(1));
         (result, ) = throwProxy.execute();
 
         Assert.isTrue(
@@ -55,7 +55,7 @@ contract TestSetMinter {
             "Should pass since a new minter (address 1) is not a current minter (address(proxyCredit))"
         );
         Assert.equal(
-            credit.minters(id),
+            credit.minters(typeID),
             address(1),
             "should pass since minter has beeen set to address 1"
         );

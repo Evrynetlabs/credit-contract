@@ -11,7 +11,7 @@ contract TestMintFungible {
     uint256[] private quantities;
     bool private isNF;
     bool private result;
-    uint256 private id;
+    uint256 private typeID;
     EER2B private proxyCredit;
     PayableThrowProxy private throwProxy;
     string private uri;
@@ -23,7 +23,7 @@ contract TestMintFungible {
         quantities = new uint256[](0);
         isNF = false;
         result = false;
-        id = credit.create(uri, isNF);
+        typeID = credit.create(uri, isNF);
         testAccounts.push(address(1));
         quantities.push(1);
         throwProxy = new PayableThrowProxy(address(credit));
@@ -31,26 +31,26 @@ contract TestMintFungible {
     }
 
     function testWhenMinterHasNoPermission() external {
-        credit.setMinter(id, testAccounts[0]);
-        proxyCredit.mintFungible(id, testAccounts, quantities);
+        credit.setMinter(typeID, testAccounts[0]);
+        proxyCredit.mintFungible(typeID, testAccounts, quantities);
         (result, ) = throwProxy.execute();
 
         Assert.isFalse(result, "should not pass creatorOnly modifier");
     }
 
     function testWhenMinterHasPermission() external {
-        credit.setMinter(id, address(proxyCredit));
-        proxyCredit.mintFungible(id, testAccounts, quantities);
+        credit.setMinter(typeID, address(proxyCredit));
+        proxyCredit.mintFungible(typeID, testAccounts, quantities);
         (result, ) = throwProxy.execute();
 
         Assert.isTrue(result, "should successfully minting a credit");
         Assert.equal(
-            credit.balanceOf(testAccounts[0], id),
+            credit.balanceOf(testAccounts[0], typeID),
             quantities[0],
             "balance should be equal to 1"
         );
         Assert.equal(
-            credit.totalSupply(id),
+            credit.totalSupply(typeID),
             quantities[0],
             "total supply of fungible type should be equal to the expected quantity"
         );
@@ -70,23 +70,23 @@ contract TestMintFungible {
             quantities.push(1);
         }
 
-        credit.mintFungible(id, testAccounts, quantities);
+        credit.mintFungible(typeID, testAccounts, quantities);
 
         Assert.equal(
-            credit.balanceOf(addr, id),
+            credit.balanceOf(addr, typeID),
             expectedBal,
             "balance of address 1 should be 5"
         );
 
         for (uint256 i = 5; i < 10; ++i) {
             Assert.equal(
-                credit.balanceOf(testAccounts[i], id),
+                credit.balanceOf(testAccounts[i], typeID),
                 1,
                 "balance of address 5 - 10 of each credit should be 1"
             );
         }
         Assert.equal(
-            credit.totalSupply(id),
+            credit.totalSupply(typeID),
             10,
             "the total supply of fungible credit type should be the expected quantity multiply with many test accounts"
         );
@@ -94,9 +94,9 @@ contract TestMintFungible {
 
     function testWhenTypeIsNotFungible() external {
         isNF = true;
-        id = credit.create(uri, isNF);
-        credit.setMinter(id, address(proxyCredit));
-        proxyCredit.mintFungible(id, testAccounts, quantities);
+        typeID = credit.create(uri, isNF);
+        credit.setMinter(typeID, address(proxyCredit));
+        proxyCredit.mintFungible(typeID, testAccounts, quantities);
         (result, ) = throwProxy.execute();
 
         Assert.isFalse(result, "should not pass require fungible");
@@ -104,8 +104,8 @@ contract TestMintFungible {
 
     function testWhenTosAndQuantititesLengthAreUnequal() external {
         testAccounts.push(address(2));
-        credit.setMinter(id, address(proxyCredit));
-        proxyCredit.mintFungible(id, testAccounts, quantities);
+        credit.setMinter(typeID, address(proxyCredit));
+        proxyCredit.mintFungible(typeID, testAccounts, quantities);
         (result, ) = throwProxy.execute();
 
         Assert.isFalse(result, "should not pass length comparison");
@@ -115,8 +115,8 @@ contract TestMintFungible {
         ThrowProxy _throwProxy = new ThrowProxy(address(credit));
         EER2B _proxyCredit = EER2B(address(_throwProxy));
         testAccounts[0] = address(_proxyCredit);
-        credit.setMinter(id, address(_proxyCredit));
-        _proxyCredit.mintFungible(id, testAccounts, quantities);
+        credit.setMinter(typeID, address(_proxyCredit));
+        _proxyCredit.mintFungible(typeID, testAccounts, quantities);
         (result, ) = _throwProxy.execute();
 
         Assert.isFalse(

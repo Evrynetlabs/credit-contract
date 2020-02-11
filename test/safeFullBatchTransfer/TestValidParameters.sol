@@ -7,7 +7,7 @@ import "../utils/PayableThrowProxy.sol";
 
 contract TestValidParameters {
     EER2B private credit;
-    uint256[] private ids;
+    uint256[] private _typeIDs;
     uint256[] private values;
     address[] private tos;
     address[] private senders;
@@ -30,12 +30,12 @@ contract TestValidParameters {
 
     // ************** set up full batch transaction parameters *****
 
-    function createFungibleCredit() internal returns (uint256 _id) {
-        _id = credit.create(uri, false);
+    function createFungibleCredit() internal returns (uint256 _typeID) {
+        _typeID = credit.create(uri, false);
     }
 
-    function createNonFungibleCredit() internal returns (uint256 _type) {
-        _type = credit.create(uri, true);
+    function createNonFungibleCredit() internal returns (uint256 _typeID) {
+        _typeID = credit.create(uri, true);
     }
 
     function setupTest() public {
@@ -43,7 +43,7 @@ contract TestValidParameters {
         result = false;
         tos = new address[](0);
         senders = new address[](0);
-        ids = new uint256[](0);
+        _typeIDs = new uint256[](0);
         values = new uint256[](0);
         creditOwnerProxy = new PayableThrowProxy(address(credit));
         creditOwner = EER2B(address(creditOwnerProxy));
@@ -68,7 +68,7 @@ contract TestValidParameters {
         _senders[0] = senders[senders.length - 1];
 
         credit.mintNonFungible(
-            credit.getNonFungibleBaseType(ids[ids.length - 1]),
+            credit.getNonFungibleBaseType(_typeIDs[_typeIDs.length - 1]),
             _senders
         );
     }
@@ -78,17 +78,21 @@ contract TestValidParameters {
         address[] memory _senders = new address[](1);
         _quantities[0] = defaultQuantity;
         _senders[0] = senders[senders.length - 1];
-        credit.mintFungible(ids[ids.length - 1], _senders, _quantities);
+        credit.mintFungible(
+            _typeIDs[_typeIDs.length - 1],
+            _senders,
+            _quantities
+        );
     }
 
     function fillUpCreateNonFungible() internal {
-        uint256 _id = createNonFungibleCredit() + 1;
-        ids.push(_id);
+        uint256 _itemID = createNonFungibleCredit() + 1;
+        _typeIDs.push(_itemID);
     }
 
     function fillUpCreateFungible() internal {
-        uint256 _id = createFungibleCredit();
-        ids.push(_id);
+        uint256 _typeID = createFungibleCredit();
+        _typeIDs.push(_typeID);
     }
 
     function fillUpToContract() internal {
@@ -207,7 +211,7 @@ contract TestValidParameters {
         internal
         returns (bool _result)
     {
-        sender.safeFullBatchTransferFrom(senders, tos, ids, values, data);
+        sender.safeFullBatchTransferFrom(senders, tos, _typeIDs, values, data);
         (_result, ) = senderProxy.execute();
     }
 
@@ -235,42 +239,42 @@ contract TestValidParameters {
             balance assertion of sender as from and sender as operator
          */
         Assert.equal(
-            credit.balanceOf(address(sender), ids[0]),
+            credit.balanceOf(address(sender), _typeIDs[0]),
             0,
             "balance of non fungible credit id[0] of the sender should be 0"
         );
         Assert.equal(
-            credit.balanceOf(address(sender), ids[1]),
+            credit.balanceOf(address(sender), _typeIDs[1]),
             0,
             "balance of non fungible credit id[1] of the sender should be 0"
         );
         Assert.equal(
-            credit.balanceOf(address(sender), ids[2]),
+            credit.balanceOf(address(sender), _typeIDs[2]),
             expectedFungibleQuantityLeft,
             "balance of fungible credit id[2] of the sender should be 0"
         );
         Assert.equal(
-            credit.balanceOf(address(sender), ids[3]),
+            credit.balanceOf(address(sender), _typeIDs[3]),
             expectedFungibleQuantityLeft,
             "balance of fungible credit id[3] of the sender should be 0"
         );
         Assert.equal(
-            credit.balanceOf(address(creditOwner), ids[4]),
+            credit.balanceOf(address(creditOwner), _typeIDs[4]),
             0,
             "balance of non fungible credit id[4] of the sender (with approval from balance owner) should be 0"
         );
         Assert.equal(
-            credit.balanceOf(address(creditOwner), ids[5]),
+            credit.balanceOf(address(creditOwner), _typeIDs[5]),
             0,
             "balance of non fungible credit id[5] of the sender (with approval from balance owner) should be 0"
         );
         Assert.equal(
-            credit.balanceOf(address(creditOwner), ids[6]),
+            credit.balanceOf(address(creditOwner), _typeIDs[6]),
             expectedFungibleQuantityLeft,
             "balance of fungible credit id[6] of the sender (with approval from balance owner) should be 0"
         );
         Assert.equal(
-            credit.balanceOf(address(creditOwner), ids[7]),
+            credit.balanceOf(address(creditOwner), _typeIDs[7]),
             expectedFungibleQuantityLeft,
             "balance of fungible credit id[7] of the sender (with approval from balance owner) should be 0"
         );
@@ -278,42 +282,42 @@ contract TestValidParameters {
             balance assertion of receiver as contract and account address
         */
         Assert.equal(
-            credit.balanceOf(address(receiverAccountAddr), ids[0]),
+            credit.balanceOf(address(receiverAccountAddr), _typeIDs[0]),
             defaultValue,
             "balance of the receiver of id[0] should be 1"
         );
         Assert.equal(
-            credit.balanceOf(address(receiverContract), ids[1]),
+            credit.balanceOf(address(receiverContract), _typeIDs[1]),
             defaultValue,
             "balance of the receiver of id[1] should be 1"
         );
         Assert.equal(
-            credit.balanceOf(address(receiverAccountAddr), ids[2]),
+            credit.balanceOf(address(receiverAccountAddr), _typeIDs[2]),
             defaultValue,
             "balance of the receiver of id[2] should be 1"
         );
         Assert.equal(
-            credit.balanceOf(address(receiverContract), ids[3]),
+            credit.balanceOf(address(receiverContract), _typeIDs[3]),
             defaultValue,
             "balance of the receiver of id[3] should be 1"
         );
         Assert.equal(
-            credit.balanceOf(address(receiverAccountAddr), ids[4]),
+            credit.balanceOf(address(receiverAccountAddr), _typeIDs[4]),
             defaultValue,
             "balance of the receiver of id[4] should be 1"
         );
         Assert.equal(
-            credit.balanceOf(address(receiverContract), ids[5]),
+            credit.balanceOf(address(receiverContract), _typeIDs[5]),
             defaultValue,
             "balance of the receiver of id[5] should be 1"
         );
         Assert.equal(
-            credit.balanceOf(address(receiverAccountAddr), ids[6]),
+            credit.balanceOf(address(receiverAccountAddr), _typeIDs[6]),
             defaultValue,
             "balance of the receiver of id[6] should be 1"
         );
         Assert.equal(
-            credit.balanceOf(address(receiverContract), ids[7]),
+            credit.balanceOf(address(receiverContract), _typeIDs[7]),
             defaultValue,
             "balance of the receiver of id[7] should be 1"
         );

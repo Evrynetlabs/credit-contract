@@ -15,7 +15,7 @@ interface IEER2A {
         The `_operator` argument MUST be msg.sender.
         The `_from` argument MUST be the address of the holder whose balance is decreased.
         The `_to` argument MUST be the address of the recipient whose balance is increased.
-        The `_id` argument MUST be the token type being transferred.
+        The `_typeID` argument MUST be the token type being transferred.
         The `_value` argument MUST be the number of tokens the holder balance is decreased by and match what the recipient balance is increased by.
         When minting/creating tokens, the `_from` argument MUST be set to `0x0` (i.e. zero address).
         When burning/destroying tokens, the `_to` argument MUST be set to `0x0` (i.e. zero address).
@@ -24,7 +24,7 @@ interface IEER2A {
         address indexed _operator,
         address indexed _from,
         address indexed _to,
-        uint256 _id,
+        uint256 _typeID,
         uint256 _value
     );
 
@@ -33,8 +33,8 @@ interface IEER2A {
         The `_operator` argument MUST be msg.sender.
         The `_from` argument MUST be the address of the holder whose balance is decreased.
         The `_to` argument MUST be the address of the recipient whose balance is increased.
-        The `_ids` argument MUST be the list of tokens being transferred.
-        The `_values` argument MUST be the list of number of tokens (matching the list and order of tokens specified in _ids) the holder balance is decreased by and match what the recipient balance is increased by.
+        The `_typeIDs` argument MUST be the list of tokens being transferred.
+        The `_values` argument MUST be the list of number of tokens (matching the list and order of tokens specified in _typeIDs) the holder balance is decreased by and match what the recipient balance is increased by.
         When minting/creating tokens, the `_from` argument MUST be set to `0x0` (i.e. zero address).
         When burning/destroying tokens, the `_to` argument MUST be set to `0x0` (i.e. zero address).
     */
@@ -42,24 +42,34 @@ interface IEER2A {
         address indexed _operator,
         address indexed _from,
         address indexed _to,
-        uint256[] _ids,
+        uint256[] _typeIDs,
         uint256[] _values
     );
 
+    /**
+        @dev `TransferFullBatch` MUST emit when tokens are transferred, including zero value transfers as well as minting or burning .
+        The `_operator` argument MUST be msg.sender.
+        The `_froms` argument MUST be the  list of address of the holder whose balance is decreased.
+        The `_tos` argument MUST be the list of address of the recipient whose balance is increased.
+        The `_typeIDs` argument MUST be the list of tokens being transferred.
+        The `_values` argument MUST be the list of number of tokens (matching the list and order of tokens specified in _typeIDs) the holder balance is decreased by and match what the recipient balance is increased by.
+        When minting/creating tokens, the `_froms` argument MUST be set to `0x0` (i.e. zero address).
+        When burning/destroying tokens, the `_tos` argument MUST be set to `0x0` (i.e. zero address).
+    */
     event TransferFullBatch(
         address indexed _operator,
         address[] _froms,
         address[] _tos,
-        uint256[] _ids,
+        uint256[] _typeIDs,
         uint256[] _values,
         bytes indexed _key
     );
 
     /**
-        @notice Transfers `_value` amount of an `_id` from the `_from` address to the `_to` address specified (with safety call).
+        @notice Transfers `_value` amount of an `_typeID` from the `_from` address to the `_to` address specified (with safety call).
         @dev Caller must be approved to manage the tokens being transferred out of the `_from` account.
         MUST revert if `_to` is the zero address.
-        MUST revert if balance of holder for token `_id` is lower than the `_value` sent.
+        MUST revert if balance of holder for token `_typeID` is lower than the `_value` sent.
         MUST revert on any other error.
         MUST emit the `TransferSingle` event. 
         @param _from    Source address
@@ -77,11 +87,11 @@ interface IEER2A {
     ) external;
 
     /**
-        @notice Transfers `_values` amount(s) of `_ids` from the `_from` address to the `_to` address specified (with safety call).
+        @notice Transfers `_values` amount(s) of `_typeIDs` from the `_from` address to the `_to` address specified (with safety call).
         @dev Caller must be approved to manage the tokens being transferred out of the `_from` account.
         MUST revert if `_to` is the zero address.
-        MUST revert if length of `_ids` is not the same as length of `_values`.
-        MUST revert if any of the balance(s) of the holder(s) for token(s) in `_ids` is lower than the respective amount(s) in `_values` sent to the recipient.
+        MUST revert if length of `_typeIDs` is not the same as length of `_values`.
+        MUST revert if any of the balance(s) of the holder(s) for token(s) in `_typeIDs` is lower than the respective amount(s) in `_values` sent to the recipient.
         MUST revert on any other error.
         MUST emit `TransferSingle` or `TransferBatch` event(s).
         @param _from    Source address
@@ -101,12 +111,12 @@ interface IEER2A {
     /**
         Multiple transfer with [multi-sender] [multi-receiver] and [muti-]credit type.
         @dev Caller must be approved or be an owner of the credit being transferred.
-        MUST be revert if the `_id` is invalid.
+        MUST be revert if the `_typeID` is invalid.
         MUST be revert if no authorized to transfer.
-        MUST be revert if `_from`'s `_id` balance less than `_value`.
+        MUST be revert if `_from`'s `_typeID` balance less than `_value`.
         MUST be revert if `_from` or `_to` is the zero address.
         MUST be revert if `_to` is a smart contract but does not implement EER2TokenReceiver.
-        MUST be revert if number of `_froms` `_tos` `_ids` and `_values` does not eqaul.
+        MUST be revert if number of `_froms` `_tos` `_typeIDs` and `_values` does not eqaul.
         MUST emit TransferFullBatch event.
         @param _froms    List of Source addresses
         @param _tos      List of Target addresses
@@ -137,7 +147,7 @@ interface IEER2A {
         @notice Get the balance of multiple account/token pairs
         @param _owners The addresses of the token holders
         @param _typeIDs    ID of the Tokens
-        @return        The _owner's balance of the Token types requested (i.e. balance for each (owner, id) pair)
+        @return        The _owner's balance of the Token types requested (i.e. balance for each (owner, typeID) pair)
      */
     function balanceOfBatch(
         address[] calldata _owners,

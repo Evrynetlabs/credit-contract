@@ -7,22 +7,22 @@ contract EER2B is IEER2B, EER2A {
     // This function only creates the type.
     function create(string calldata _metaLink, bool _isNF)
         external
-        returns (uint256 _type)
+        returns (uint256 _typeID)
     {
         // Store the type in the upper 128 bits
-        _type = (++nonce << 128);
+        _typeID = (++nonce << 128);
 
         // Set a flag if this is an NFI.
-        if (_isNF) _type = _type | TYPE_NF_BIT;
+        if (_isNF) _typeID = _typeID | TYPE_NF_BIT;
 
         // This will allow restricted access to minters.
-        minters[_type] = msg.sender;
+        minters[_typeID] = msg.sender;
 
         // emit a Transfer event with Create semantic to help with discovery.
-        emit TransferSingle(msg.sender, address(0x0), address(0x0), _type, 0);
+        emit TransferSingle(msg.sender, address(0x0), address(0x0), _typeID, 0);
 
-        if (bytes(_metaLink).length > 0) metalinks[_type] = _metaLink;
-        emit URI(_metaLink, _type);
+        if (bytes(_metaLink).length > 0) metalinks[_typeID] = _metaLink;
+        emit URI(_metaLink, _typeID);
     }
 
     /**
@@ -38,7 +38,7 @@ contract EER2B is IEER2B, EER2A {
         external
         minterOnly(_typeID)
     {
-        // No need to check this is a nf type rather than an id since
+        // No need to check this is a nf type rather than an typeID since
         // minterOnly() will only let a type pass through.
         require(isNonFungible(_typeID));
 
@@ -48,21 +48,21 @@ contract EER2B is IEER2B, EER2A {
 
         for (uint256 i = 0; i < _tos.length; ++i) {
             address to = _tos[i];
-            uint256 id = _typeID | (index + i);
+            uint256 typeID = _typeID | (index + i);
 
-            nfOwners[id] = to;
+            nfOwners[typeID] = to;
             balances[_typeID][to] = balances[_typeID][to].add(1);
             totalSupplies[_typeID] = totalSupplies[_typeID].add(1);
-            totalSupplies[id] = totalSupplies[id].add(1);
+            totalSupplies[typeID] = totalSupplies[typeID].add(1);
 
-            emit TransferSingle(msg.sender, address(0x0), to, id, 1);
+            emit TransferSingle(msg.sender, address(0x0), to, typeID, 1);
 
             if (to.isContract()) {
                 _doSafeTransferAcceptanceCheck(
                     msg.sender,
                     msg.sender,
                     to,
-                    id,
+                    typeID,
                     1,
                     ""
                 );
@@ -109,7 +109,7 @@ contract EER2B is IEER2B, EER2A {
     }
 
     /**
-        Delete `_value` of Credit `_id` from the world.
+        Delete `_value` of Credit `_itemID` from the world.
         @param _itemID  Item of non-fungible credit type
         @param _from Source address
     */
@@ -137,7 +137,7 @@ contract EER2B is IEER2B, EER2A {
     }
 
     /**
-        Delete `_value` of Credit `_id` from the world.
+        Delete `_value` of Credit `_typeID` from the world.
         @param _typeID  Credit type
         @param _value Burn Credit quantities
         @param _from Source address
@@ -159,7 +159,7 @@ contract EER2B is IEER2B, EER2A {
 
     /**
         give `_type` creator authorized to `_minter`.
-        @param _typeID  Credit _id (when credit is fungible) or _type (when credit is non-fungible)
+        @param _typeID  Credit _typeID (when credit is fungible) or _type (when credit is non-fungible)
         @param _to New minter, in case of address 0 the authorized will be locked forever
     */
     function setMinter(uint256 _typeID, address _to)

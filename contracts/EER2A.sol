@@ -3,12 +3,14 @@ pragma solidity ^0.5.0;
 import "./IEER2A.sol";
 import "./SafeMath.sol";
 import "./Address.sol";
-import "./Common.sol";
 import "./IEER2TokenReceiver.sol";
 
-contract EER2A is IEER2A, Common {
+contract EER2A is IEER2A {
     using SafeMath for uint256;
     using Address for address;
+
+    bytes4 internal constant EER2_ACCEPTED = 0x09a23c29; // bytes4(keccak256("onEER2Received(address,address,uint256,uint256,bytes)"))
+    bytes4 internal constant EER2_BATCH_ACCEPTED = 0xbaf5f228; // bytes4(keccak256("onEER2BatchReceived(address,address,uint256[],uint256[],bytes)"))
 
     // Use a split bit implementation.
     // Store the type in the upper 128 bits..
@@ -27,7 +29,7 @@ contract EER2A is IEER2A, Common {
     mapping(uint256 => uint256) public maxIndex;
     mapping(uint256 => uint256) public totalSupplies;
 
-    // id => (owner => balance)
+    // typeID => (owner => balance)
     mapping(uint256 => mapping(address => uint256)) internal balances;
 
     // owner => (operator => approved)
@@ -66,8 +68,8 @@ contract EER2A is IEER2A, Common {
         return nfOwners[_itemID];
     }
 
-    modifier minterOnly(uint256 _id) {
-        require(minters[_id] == msg.sender);
+    modifier minterOnly(uint256 _typeID) {
+        require(minters[_typeID] == msg.sender);
         _;
     }
 
@@ -98,7 +100,7 @@ contract EER2A is IEER2A, Common {
         @dev EER2 balanceOfBatch function
         @param _owners The addresses of the token holders
         @param _typeIDs ID of the Tokens
-        @return        The _owner's balance of the Token types requested (i.e. balance for each (owner, id) pair)
+        @return        The _owner's balance of the Token types requested (i.e. balance for each (owner, typeID) pair)
      */
     function balanceOfBatch(
         address[] calldata _owners,
@@ -142,10 +144,10 @@ contract EER2A is IEER2A, Common {
     }
 
     /**
-        @notice Transfers `_value` amount of an `_id` from the `_from` address to the `_to` address specified (with safety call).
+        @notice Transfers `_value` amount of an `_typeID` from the `_from` address to the `_to` address specified (with safety call).
         @dev Caller must be approved to manage the tokens being transferred out of the `_from` account.
         MUST revert if `_to` is the zero address.
-        MUST revert if balance of holder for token `_id` is lower than the `_value` sent.
+        MUST revert if balance of holder for token `_typeID` is lower than the `_value` sent.
         MUST revert on any other error.
         MUST emit the `TransferSingle` event. 
         @param _from    Source address
@@ -200,11 +202,11 @@ contract EER2A is IEER2A, Common {
     }
 
     /**
-        @notice Transfers `_values` amount(s) of `_ids` from the `_from` address to the `_to` address specified (with safety call).
+        @notice Transfers `_values` amount(s) of `_typeIDs` from the `_from` address to the `_to` address specified (with safety call).
         @dev Caller must be approved to manage the tokens being transferred out of the `_from` account.
         MUST revert if `_to` is the zero address.
-        MUST revert if length of `_ids` is not the same as length of `_values`.
-        MUST revert if any of the balance(s) of the holder(s) for token(s) in `_ids` is lower than the respective amount(s) in `_values` sent to the recipient.
+        MUST revert if length of `_typeIDs` is not the same as length of `_values`.
+        MUST revert if any of the balance(s) of the holder(s) for token(s) in `_typeIDs` is lower than the respective amount(s) in `_values` sent to the recipient.
         MUST revert on any other error.
         MUST emit `TransferSingle` or `TransferBatch` event(s).
         @param _from    Source address
@@ -263,12 +265,12 @@ contract EER2A is IEER2A, Common {
     /**
         Multiple transfer with [multi-sender] [multi-receiver] and [muti-]credit type.
         @dev Caller must be approved or be an owner of the credit being transferred.
-        MUST be revert if the `_id` is invalid.
+        MUST be revert if the `_typeID` is invalid.
         MUST be revert if no authorized to transfer.
-        MUST be revert if `_from`'s `_id` balance less than `_value`.
+        MUST be revert if `_from`'s `_typeID` balance less than `_value`.
         MUST be revert if `_from` or `_to` is the zero address.
         MUST be revert if `_to` is a smart contract but does not implement EER2TokenReceiver.
-        MUST be revert if number of `_froms` `_tos` `_ids` and `_values` does not eqaul.
+        MUST be revert if number of `_froms` `_tos` `_typeIDs` and `_values` does not eqaul.
         MUST emit TransferFullBatch event.
         @param _froms    List of Source addresses
         @param _tos      List of Target addresses
@@ -341,7 +343,7 @@ contract EER2A is IEER2A, Common {
         address _operator,
         address _from,
         address _to,
-        uint256 _id,
+        uint256 _typeID,
         uint256 _value,
         bytes memory _data
     ) internal {
@@ -354,7 +356,7 @@ contract EER2A is IEER2A, Common {
             IEER2TokenReceiver(_to).onEER2Received(
                 _operator,
                 _from,
-                _id,
+                _typeID,
                 _value,
                 _data
             ) ==
@@ -367,7 +369,7 @@ contract EER2A is IEER2A, Common {
         address _operator,
         address _from,
         address _to,
-        uint256[] memory _ids,
+        uint256[] memory _typeIDs,
         uint256[] memory _values,
         bytes memory _data
     ) internal {
@@ -380,7 +382,7 @@ contract EER2A is IEER2A, Common {
             IEER2TokenReceiver(_to).onEER2BatchReceived(
                 _operator,
                 _from,
-                _ids,
+                _typeIDs,
                 _values,
                 _data
             ) ==

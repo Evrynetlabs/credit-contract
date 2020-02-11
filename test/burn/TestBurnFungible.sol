@@ -9,7 +9,7 @@ contract TestBurnFungible {
     EER2B private credit;
     string private uri;
     bool private isNF;
-    uint256 private id;
+    uint256 private typeID;
     bool private result;
     address[] private testAccounts;
     uint256[] private quantities;
@@ -21,7 +21,7 @@ contract TestBurnFungible {
         uri = "foo";
         isNF = false;
         result = false;
-        id = credit.create(uri, isNF);
+        typeID = credit.create(uri, isNF);
         testAccounts = new address[](0);
         testAccounts.push(address(1));
         quantities = new uint256[](0);
@@ -32,10 +32,10 @@ contract TestBurnFungible {
 
     function testWhenCreditIsNonFungible() external {
         isNF = true;
-        id = credit.create(uri, isNF);
-        credit.mintNonFungible(id, testAccounts);
+        typeID = credit.create(uri, isNF);
+        credit.mintNonFungible(typeID, testAccounts);
 
-        proxyCredit.burnFungible(id, testAccounts[0], 1);
+        proxyCredit.burnFungible(typeID, testAccounts[0], 1);
         (result, ) = throwProxy.execute();
         Assert.isFalse(
             result,
@@ -44,37 +44,37 @@ contract TestBurnFungible {
     }
 
     function testWhenCallerHasNoPermission() external {
-        credit.mintFungible(id, testAccounts, quantities);
+        credit.mintFungible(typeID, testAccounts, quantities);
 
-        proxyCredit.burnFungible(id, testAccounts[0], 1);
+        proxyCredit.burnFungible(typeID, testAccounts[0], 1);
         (result, ) = throwProxy.execute();
         Assert.isFalse(
             result,
-            "should not pass since the caller is not the owner of credit id"
+            "should not pass since the caller is not the owner of credit typeID"
         );
     }
 
     function testWhenSuccess() external {
         testAccounts[0] = address(proxyCredit);
-        credit.mintFungible(id, testAccounts, quantities);
+        credit.mintFungible(typeID, testAccounts, quantities);
 
-        proxyCredit.burnFungible(id, testAccounts[0], 1);
+        proxyCredit.burnFungible(typeID, testAccounts[0], 1);
         (result, ) = throwProxy.execute();
         Assert.isTrue(result, "should pass since credit is fungible");
         Assert.equal(
-            credit.balanceOf(testAccounts[0], id),
+            credit.balanceOf(testAccounts[0], typeID),
             0,
-            "the balance of this credit id/type after being burned should be 0"
+            "the balance of this credit typeID/type after being burned should be 0"
         );
         Assert.equal(
-            credit.totalSupply(id),
+            credit.totalSupply(typeID),
             0,
-            "the total supply of this credit id/type after being burned should be decreased"
+            "the total supply of this credit typeID/type after being burned should be decreased"
         );
     }
 
     function testWhenInsufficientCredit() external {
-        proxyCredit.burnFungible(id, testAccounts[0], 1);
+        proxyCredit.burnFungible(typeID, testAccounts[0], 1);
         (result, ) = throwProxy.execute();
         Assert.isFalse(
             result,

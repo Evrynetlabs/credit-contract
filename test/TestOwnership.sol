@@ -9,11 +9,11 @@ contract EER2BWrapper is EER2B {
 
     function callBalanceOfBatch(
         address[] calldata _owners,
-        uint256[] calldata _ids,
+        uint256[] calldata _typeIDs,
         uint256[] calldata _expecteds
     ) external {
         Assert.equal(
-            this.balanceOfBatch(_owners, _ids),
+            this.balanceOfBatch(_owners, _typeIDs),
             _expecteds,
             "balances are invalid"
         );
@@ -82,12 +82,12 @@ contract TestOwnership {
         owners[3] = barAccount;
         owners[4] = fooAccount;
 
-        uint256[] memory ids = new uint256[](5);
-        ids[0] = fungibleCreditID;
-        ids[1] = nonFungibleCreditID;
-        ids[2] = fungibleCreditID;
-        ids[3] = nonFungibleCreditID;
-        ids[4] = notExistingCreditID;
+        uint256[] memory typeIDs = new uint256[](5);
+        typeIDs[0] = fungibleCreditID;
+        typeIDs[1] = nonFungibleCreditID;
+        typeIDs[2] = fungibleCreditID;
+        typeIDs[3] = nonFungibleCreditID;
+        typeIDs[4] = notExistingCreditID;
 
         uint256[] memory expecteds = new uint256[](5);
         expecteds[0] = expectedBalance;
@@ -98,7 +98,7 @@ contract TestOwnership {
 
         EER2BWrapper(address(throwProxy)).callBalanceOfBatch(
             owners,
-            ids,
+            typeIDs,
             expecteds
         );
         (bool success, ) = throwProxy.execute.gas(200000)();
@@ -110,16 +110,16 @@ contract TestOwnership {
         owners[0] = fooAccount;
         owners[1] = barAccount;
 
-        uint256[] memory ids = new uint256[](3);
-        ids[0] = fungibleCreditID;
-        ids[1] = nonFungibleCreditID;
-        ids[2] = fungibleCreditID;
+        uint256[] memory typeIDs = new uint256[](3);
+        typeIDs[0] = fungibleCreditID;
+        typeIDs[1] = nonFungibleCreditID;
+        typeIDs[2] = fungibleCreditID;
 
         uint256[] memory expecteds = new uint256[](3);
 
         EER2BWrapper(address(throwProxy)).callBalanceOfBatch(
             owners,
-            ids,
+            typeIDs,
             expecteds
         );
         (bool success, ) = throwProxy.execute.gas(200000)();

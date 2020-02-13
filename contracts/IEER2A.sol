@@ -11,7 +11,7 @@ interface IEER2A {
     );
 
     /**
-        @dev Either `TransferSingle` or `TransferBatch` MUST emit when tokens are transferred, including zero value transfers as well as minting or burning .
+        @dev Either `TransferSingle`, `TransferBatch` or `TransferFullBatch` MUST emit when tokens are transferred, including zero value transfers as well as minting or burning .
         The `_operator` argument MUST be msg.sender.
         The `_from` argument MUST be the address of the holder whose balance is decreased.
         The `_to` argument MUST be the address of the recipient whose balance is increased.
@@ -29,7 +29,7 @@ interface IEER2A {
     );
 
     /**
-        @dev Either `TransferSingle` or `TransferBatch` MUST emit when tokens are transferred, including zero value transfers as well as minting or burning .
+        @dev Either `TransferSingle`, `TransferBatch` or `TransferFullBatch` MUST emit when tokens are transferred, including zero value transfers as well as minting or burning .
         The `_operator` argument MUST be msg.sender.
         The `_from` argument MUST be the address of the holder whose balance is decreased.
         The `_to` argument MUST be the address of the recipient whose balance is increased.
@@ -47,12 +47,12 @@ interface IEER2A {
     );
 
     /**
-        @dev `TransferFullBatch` MUST emit when tokens are transferred, including zero value transfers as well as minting or burning .
+        @dev Either `TransferSingle`, `TransferBatch` or `TransferFullBatch` MUST emit when tokens are transferred, including zero value transfers as well as minting or burning .
         The `_operator` argument MUST be msg.sender.
         The `_froms` argument MUST be the  list of address of the holder whose balance is decreased.
         The `_tos` argument MUST be the list of address of the recipient whose balance is increased.
         The `_typeIDs` argument MUST be the list of tokens being transferred.
-        The `_values` argument MUST be the list of number of tokens (matching the list and order of tokens specified in _typeIDs) the holder balance is decreased by and match what the recipient balance is increased by.
+        The `_values` argument MUST be the list of number of tokens (matching the list and order of holders, recipients, and tokens specified in _froms, _tos, and _typeIDs correspondingly) the holder balance is decreased by and match what the recipient balance is increased by.
         When minting/creating tokens, the `_froms` argument MUST be set to `0x0` (i.e. zero address).
         When burning/destroying tokens, the `_tos` argument MUST be set to `0x0` (i.e. zero address).
     */
@@ -109,14 +109,13 @@ interface IEER2A {
     ) external;
 
     /**
-        Multiple transfer with [multi-sender] [multi-receiver] and [muti-]credit type.
+        @notice Transfers `_values` amount(s) of `_typeIDs` from the `_froms` address(s) to the `_tos` address(s) specified (with safety call).
         @dev Caller must be approved or be an owner of the credit being transferred.
-        MUST be revert if the `_typeID` is invalid.
-        MUST be revert if no authorized to transfer.
-        MUST be revert if `_from`'s `_typeID` balance less than `_value`.
-        MUST be revert if `_from` or `_to` is the zero address.
-        MUST be revert if `_to` is a smart contract but does not implement EER2TokenReceiver.
-        MUST be revert if number of `_froms` `_tos` `_typeIDs` and `_values` does not eqaul.
+        MUST revert if any of `_to` is the zero address
+        MUST revert if length of `_froms`, `_tos`, `_typeIDs`, and `_values` are not equal. 
+        MUST revert if any of the balance(s) of the holder(s) for token(s) in `_typeIDs` is lower than the respective amount(s) in `_values` sent to the recipient.
+        MUST revert if `_todd` is a smart contract but does not implement EER2TokenReceiver.
+        MUST revert on any other error.
         MUST emit TransferFullBatch event.
         @param _froms    List of Source addresses
         @param _tos      List of Target addresses
@@ -174,16 +173,16 @@ interface IEER2A {
         returns (bool);
 
     /** 
-        @notice Get the owner of the n non-fungible credit
+        @notice Get the owner of the non-fungible credit
         @param _itemID the item id of the non-fungible credit
         @return The owner of the non-fungible credit
     */
     function ownerOf(uint256 _itemID) external view returns (address);
 
     /** 
-        @notice Get contract address of metalink
+        @notice Get contract address or URI of metalink
         @param _typeID ID of the credit type
-        @return contract address of metalink
+        @return a string of either an address of metadata contract or an URI points to the JSON file that conforms to the "EER-2 Metadata URI JSON Schema"
     */
     function metaLink(uint256 _typeID) external view returns (string memory);
 }

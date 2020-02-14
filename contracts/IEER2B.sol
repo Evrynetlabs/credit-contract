@@ -11,8 +11,8 @@ interface IEER2B {
 
     /**
         @dev MUST emit when creator authorized to `_minter`. 
-        @param _typeID The credit type id
-        @param _minter minter who will be authorized
+        @param _typeID The ID of token being updated.
+        @param _minter The address which will be authorized
      */
     event SetMinter(uint256 indexed _typeID, address _minter);
 

@@ -6,6 +6,7 @@ import "../../contracts/EER2B.sol";
 import "../utils/PayableThrowProxy.sol";
 import "../utils/ThrowProxy.sol";
 
+
 contract TestSafeBatchTransferSuccess {
     EER2B private credit;
     string private uri;
@@ -54,13 +55,7 @@ contract TestSafeBatchTransferSuccess {
     }
 
     function testValidParametersWithSenderAsSource() external {
-        proxyCredit.safeBatchTransferFrom(
-            address(proxyCredit),
-            address(1),
-            typeIDs,
-            values,
-            data
-        );
+        proxyCredit.safeBatchTransferFrom(address(proxyCredit), address(1), typeIDs, values, data);
         (result, ) = throwProxy.execute();
         Assert.isTrue(result, "should pass since parameters are valid");
         Assert.equal(
@@ -110,13 +105,7 @@ contract TestSafeBatchTransferSuccess {
             "proxy credit should be an operator of balance owner"
         );
 
-        operator.safeBatchTransferFrom(
-            address(proxyCredit),
-            address(1),
-            typeIDs,
-            values,
-            data
-        );
+        operator.safeBatchTransferFrom(address(proxyCredit), address(1), typeIDs, values, data);
         (result, ) = transferCaller.execute();
         Assert.isTrue(result, "should pass since parameters are valid");
         Assert.equal(
@@ -152,9 +141,7 @@ contract TestSafeBatchTransferSuccess {
     }
 
     function testWhenDestinationImplementOnEER2BatchReceived() external {
-        PayableThrowProxy destinationProxy = new PayableThrowProxy(
-            address(credit)
-        );
+        PayableThrowProxy destinationProxy = new PayableThrowProxy(address(credit));
         EER2B destination = EER2B(address(destinationProxy));
 
         proxyCredit.safeBatchTransferFrom(

@@ -5,6 +5,7 @@ import "../utils/ThrowProxy.sol";
 import "../utils/PayableThrowProxy.sol";
 import "../../contracts/EER2B.sol";
 
+
 contract TestErrorTransferCredit {
     EER2B public credit;
     PayableThrowProxy private fooAccountProxy;
@@ -47,10 +48,7 @@ contract TestErrorTransferCredit {
     function prepareOperator(bool approved) internal {
         EER2B(fooAccount).setApprovalForAll(operatorAccount, approved);
         (bool success, ) = fooAccountProxy.execute();
-        Assert.isTrue(
-            success,
-            "should not throw error setting approval to operator"
-        );
+        Assert.isTrue(success, "should not throw error setting approval to operator");
     }
 
     function testErrorTransferCreditToZeroAddress() external {
@@ -58,18 +56,9 @@ contract TestErrorTransferCredit {
         address barAccount = address(0);
         prepareOperator(true);
 
-        EER2B(fooAccount).safeTransferFrom(
-            fooAccount,
-            barAccount,
-            fungibleCreditID,
-            1,
-            bytes("")
-        );
+        EER2B(fooAccount).safeTransferFrom(fooAccount, barAccount, fungibleCreditID, 1, bytes(""));
         (bool success, ) = fooAccountProxy.execute();
-        Assert.isFalse(
-            success,
-            "should throw error owner transfers to zero address"
-        );
+        Assert.isFalse(success, "should throw error owner transfers to zero address");
 
         EER2B(operatorAccount).safeTransferFrom(
             fooAccount,
@@ -79,10 +68,7 @@ contract TestErrorTransferCredit {
             bytes("")
         );
         (success, ) = operatorAccountProxy.execute();
-        Assert.isFalse(
-            success,
-            "should throw error operator transfers to zero address"
-        );
+        Assert.isFalse(success, "should throw error operator transfers to zero address");
     }
 
     function testErrorUnauthorizedOperator() external {
@@ -115,10 +101,7 @@ contract TestErrorTransferCredit {
             bytes("")
         );
         (bool success, ) = fooAccountProxy.execute();
-        Assert.isFalse(
-            success,
-            "should throw error transfer without ownership"
-        );
+        Assert.isFalse(success, "should throw error transfer without ownership");
 
         EER2B(operatorAccount).safeTransferFrom(
             fooAccount,
@@ -128,10 +111,7 @@ contract TestErrorTransferCredit {
             bytes("")
         );
         (success, ) = operatorAccountProxy.execute();
-        Assert.isFalse(
-            success,
-            "should throw error transfer without ownership via operator"
-        );
+        Assert.isFalse(success, "should throw error transfer without ownership via operator");
     }
 
     function testErrorTransferCreditToNotSupportedContract() external {
@@ -139,18 +119,9 @@ contract TestErrorTransferCredit {
         address barContract = address(new ThrowProxy(address(1)));
         prepareOperator(true);
 
-        EER2B(fooAccount).safeTransferFrom(
-            fooAccount,
-            barContract,
-            fungibleCreditID,
-            1,
-            bytes("")
-        );
+        EER2B(fooAccount).safeTransferFrom(fooAccount, barContract, fungibleCreditID, 1, bytes(""));
         (bool success, ) = fooAccountProxy.execute();
-        Assert.isFalse(
-            success,
-            "should throw error owner transfers to not supported contract"
-        );
+        Assert.isFalse(success, "should throw error owner transfers to not supported contract");
 
         EER2B(operatorAccount).safeTransferFrom(
             fooAccount,
@@ -160,10 +131,7 @@ contract TestErrorTransferCredit {
             bytes("")
         );
         (success, ) = operatorAccountProxy.execute();
-        Assert.isFalse(
-            success,
-            "should throw error operator transfers to not supported contract"
-        );
+        Assert.isFalse(success, "should throw error operator transfers to not supported contract");
     }
 
     function testErrorTransferCreditInsufficientAmount() external {

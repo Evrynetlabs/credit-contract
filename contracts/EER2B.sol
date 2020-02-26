@@ -3,12 +3,10 @@ pragma solidity ^0.5.0;
 import "./EER2A.sol";
 import "./IEER2B.sol";
 
+
 contract EER2B is IEER2B, EER2A {
     // This function only creates the type.
-    function create(string calldata _metaLink, bool _isNF)
-        external
-        returns (uint256 _typeID)
-    {
+    function create(string calldata _metaLink, bool _isNF) external returns (uint256 _typeID) {
         // Store the type in the upper 128 bits
         _typeID = (++nonce << 128);
 
@@ -58,29 +56,17 @@ contract EER2B is IEER2B, EER2A {
             emit TransferSingle(msg.sender, address(0x0), to, typeID, 1);
 
             if (to.isContract()) {
-                _doSafeTransferAcceptanceCheck(
-                    msg.sender,
-                    msg.sender,
-                    to,
-                    typeID,
-                    1,
-                    ""
-                );
+                _doSafeTransferAcceptanceCheck(msg.sender, msg.sender, to, typeID, 1, "");
             }
-
         }
     }
 
-    function mintFungible(
-        uint256 _typeID,
-        address[] calldata _tos,
-        uint256[] calldata _values
-    ) external minterOnly(_typeID) {
+    function mintFungible(uint256 _typeID, address[] calldata _tos, uint256[] calldata _values)
+        external
+        minterOnly(_typeID)
+    {
         require(isFungible(_typeID));
-        require(
-            _tos.length == _values.length,
-            "Credit: Array length must match"
-        );
+        require(_tos.length == _values.length, "Credit: Array length must match");
 
         for (uint256 i = 0; i < _tos.length; ++i) {
             address to = _tos[i];
@@ -96,14 +82,7 @@ contract EER2B is IEER2B, EER2A {
             emit TransferSingle(msg.sender, address(0x0), to, _typeID, value);
 
             if (to.isContract()) {
-                _doSafeTransferAcceptanceCheck(
-                    msg.sender,
-                    msg.sender,
-                    to,
-                    _typeID,
-                    value,
-                    ""
-                );
+                _doSafeTransferAcceptanceCheck(msg.sender, msg.sender, to, _typeID, value, "");
             }
         }
     }
@@ -114,10 +93,7 @@ contract EER2B is IEER2B, EER2A {
         @param _from Source address
     */
     function burnNonFungible(uint256 _itemID, address _from) external {
-        require(
-            isNonFungible(_itemID),
-            "Credit: asset being burned is not a non-fungible asset"
-        );
+        require(isNonFungible(_itemID), "Credit: asset being burned is not a non-fungible asset");
         require(
             isNonFungibleItem(_itemID),
             "Credit: asset being burned is not a non-fungible item id"
@@ -142,9 +118,7 @@ contract EER2B is IEER2B, EER2A {
         @param _value Burn Credit quantities
         @param _from Source address
     */
-    function burnFungible(uint256 _typeID, address _from, uint256 _value)
-        external
-    {
+    function burnFungible(uint256 _typeID, address _from, uint256 _value) external {
         require(isFungible(_typeID));
         require(
             _from == msg.sender || operatorApproval[_from][msg.sender] == true,
@@ -162,14 +136,8 @@ contract EER2B is IEER2B, EER2A {
         @param _typeID  Credit _typeID (when credit is fungible) or _type (when credit is non-fungible)
         @param _to New minter, in case of address 0 the authorized will be locked forever
     */
-    function setMinter(uint256 _typeID, address _to)
-        external
-        minterOnly(_typeID)
-    {
-        require(
-            minters[_typeID] != _to,
-            "Credit: cannot set current minter as a new minter"
-        );
+    function setMinter(uint256 _typeID, address _to) external minterOnly(_typeID) {
+        require(minters[_typeID] != _to, "Credit: cannot set current minter as a new minter");
         minters[_typeID] = _to;
 
         emit SetMinter(_typeID, _to);

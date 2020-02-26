@@ -5,6 +5,7 @@ import "truffle/DeployedAddresses.sol";
 import "../../contracts/EER2B.sol";
 import "../utils/PayableThrowProxy.sol";
 
+
 contract TestSafeBatchTransferError {
     EER2B private credit;
     string private uri;
@@ -52,41 +53,20 @@ contract TestSafeBatchTransferError {
     }
 
     function testTransferToAddressZero() external {
-        proxyCredit.safeBatchTransferFrom(
-            address(credit),
-            address(0),
-            typeIDs,
-            values,
-            data
-        );
+        proxyCredit.safeBatchTransferFrom(address(credit), address(0), typeIDs, values, data);
         (result, ) = throwProxy.execute();
         Assert.isFalse(result, "should not pass since address is empty(0)");
     }
 
     function testUnequalIdsAndValuesLength() external {
         values.push(1);
-        proxyCredit.safeBatchTransferFrom(
-            address(1),
-            address(2),
-            typeIDs,
-            values,
-            data
-        );
+        proxyCredit.safeBatchTransferFrom(address(1), address(2), typeIDs, values, data);
         (result, ) = throwProxy.execute();
-        Assert.isFalse(
-            result,
-            "should not pass since tos and values contains unequal length"
-        );
+        Assert.isFalse(result, "should not pass since tos and values contains unequal length");
     }
 
     function testWhenMsgSenderIsNotAuthorized() external {
-        proxyCredit.safeBatchTransferFrom(
-            address(1),
-            address(2),
-            typeIDs,
-            values,
-            data
-        );
+        proxyCredit.safeBatchTransferFrom(address(1), address(2), typeIDs, values, data);
         (result, ) = throwProxy.execute();
         Assert.isFalse(
             result,
@@ -96,13 +76,7 @@ contract TestSafeBatchTransferError {
 
     function testInsufficientFungibleCredit() external {
         values[1] = 2;
-        proxyCredit.safeBatchTransferFrom(
-            address(proxyCredit),
-            address(2),
-            typeIDs,
-            values,
-            data
-        );
+        proxyCredit.safeBatchTransferFrom(address(proxyCredit), address(2), typeIDs, values, data);
         (result, ) = throwProxy.execute();
         Assert.isFalse(result, "should not pass since insufficient amount");
     }

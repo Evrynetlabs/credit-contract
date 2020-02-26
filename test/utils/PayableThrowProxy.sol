@@ -3,14 +3,9 @@ pragma solidity ^0.5.0;
 import "../../contracts/IEER2TokenReceiver.sol";
 import "./ThrowProxy.sol";
 
+
 contract PayableThrowProxy is ThrowProxy, IEER2TokenReceiver {
-    event Received(
-        address _operator,
-        address _from,
-        uint256 _typeID,
-        uint256 _value,
-        bytes _data
-    );
+    event Received(address _operator, address _from, uint256 _typeID, uint256 _value, bytes _data);
     event BatchReceived(
         address _operator,
         address _from,

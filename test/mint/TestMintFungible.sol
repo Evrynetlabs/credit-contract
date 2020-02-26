@@ -5,6 +5,7 @@ import "truffle/DeployedAddresses.sol";
 import "../../contracts/EER2B.sol";
 import "../utils/PayableThrowProxy.sol";
 
+
 contract TestMintFungible {
     EER2B private credit;
     address[] private testAccounts;

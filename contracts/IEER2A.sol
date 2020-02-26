@@ -1,14 +1,11 @@
 pragma solidity ^0.5.0;
 
+
 interface IEER2A {
     /**
         @dev MUST emit when approval for a second party/operator address to manage all tokens for an owner address is enabled or disabled (absense of an event assumes disabled).
     */
-    event ApprovalForAll(
-        address indexed _owner,
-        address indexed _operator,
-        bool _approved
-    );
+    event ApprovalForAll(address indexed _owner, address indexed _operator, bool _approved);
 
     /**
         @dev Either `TransferSingle`, `TransferBatch` or `TransferFullBatch` MUST emit when tokens are transferred, including zero value transfers as well as minting or burning .
@@ -137,10 +134,7 @@ interface IEER2A {
         @param _typeID     ID of the Token
         @return        The _owner's balance of the Token type requested
      */
-    function balanceOf(address _owner, uint256 _typeID)
-        external
-        view
-        returns (uint256);
+    function balanceOf(address _owner, uint256 _typeID) external view returns (uint256);
 
     /**
         @notice Get the balance of multiple account/token pairs
@@ -148,10 +142,10 @@ interface IEER2A {
         @param _typeIDs    ID of the Tokens
         @return        The _owner's balance of the Token types requested (i.e. balance for each (owner, typeID) pair)
      */
-    function balanceOfBatch(
-        address[] calldata _owners,
-        uint256[] calldata _typeIDs
-    ) external view returns (uint256[] memory);
+    function balanceOfBatch(address[] calldata _owners, uint256[] calldata _typeIDs)
+        external
+        view
+        returns (uint256[] memory);
 
     /**
         @notice Enable or disable approval for a third party ("operator") to manage all of the caller's tokens.
@@ -167,10 +161,7 @@ interface IEER2A {
         @param _operator  Address of authorized operator
         @return           True if the operator is approved, false if not
     */
-    function isApprovedForAll(address _owner, address _operator)
-        external
-        view
-        returns (bool);
+    function isApprovedForAll(address _owner, address _operator) external view returns (bool);
 
     /** 
         @notice Get the owner of the non-fungible credit

@@ -5,6 +5,7 @@ import "truffle/DeployedAddresses.sol";
 import "../../contracts/EER2B.sol";
 import "../utils/PayableThrowProxy.sol";
 
+
 contract TestInvalidParameters {
     EER2B private credit;
     string private uri;
@@ -144,17 +145,8 @@ contract TestInvalidParameters {
         senders.push(address(proxyCredit));
     }
 
-    function executeSafeFullBatchTransferFrom()
-        internal
-        returns (bool _result)
-    {
-        proxyCredit.safeFullBatchTransferFrom(
-            senders,
-            tos,
-            typeIDs,
-            values,
-            data
-        );
+    function executeSafeFullBatchTransferFrom() internal returns (bool _result) {
+        proxyCredit.safeFullBatchTransferFrom(senders, tos, typeIDs, values, data);
         (_result, ) = throwProxy.execute();
     }
 
@@ -169,10 +161,7 @@ contract TestInvalidParameters {
     function testInvalidParametersLength() external {
         fillUpInvalidParametersLengthParams();
         result = executeSafeFullBatchTransferFrom();
-        Assert.isFalse(
-            result,
-            "should not pass since parameters contain invalid length"
-        );
+        Assert.isFalse(result, "should not pass since parameters contain invalid length");
     }
 
     function testTransferToAddressZero() external {

@@ -5,6 +5,7 @@ import "truffle/DeployedAddresses.sol";
 import "../../contracts/EER2B.sol";
 import "../utils/PayableThrowProxy.sol";
 
+
 contract TestValidParameters {
     EER2B private credit;
     uint256[] private _typeIDs;
@@ -23,8 +24,7 @@ contract TestValidParameters {
     address private receiverAccountAddr = address(1);
     uint256 private defaultQuantity = 100;
     uint256 private defaultValue = 1;
-    uint256 private expectedFungibleQuantityLeft = defaultQuantity -
-        defaultValue;
+    uint256 private expectedFungibleQuantityLeft = defaultQuantity - defaultValue;
 
     // ********************************************* Internal Function *********************************************
 
@@ -78,11 +78,7 @@ contract TestValidParameters {
         address[] memory _senders = new address[](1);
         _quantities[0] = defaultQuantity;
         _senders[0] = senders[senders.length - 1];
-        credit.mintFungible(
-            _typeIDs[_typeIDs.length - 1],
-            _senders,
-            _quantities
-        );
+        credit.mintFungible(_typeIDs[_typeIDs.length - 1], _senders, _quantities);
     }
 
     function fillUpCreateNonFungible() internal {
@@ -207,10 +203,7 @@ contract TestValidParameters {
         fillUpMintFungible();
     }
 
-    function executeSafeFullBatchTransferFrom()
-        internal
-        returns (bool _result)
-    {
+    function executeSafeFullBatchTransferFrom() internal returns (bool _result) {
         sender.safeFullBatchTransferFrom(senders, tos, _typeIDs, values, data);
         (_result, ) = senderProxy.execute();
     }
@@ -231,10 +224,7 @@ contract TestValidParameters {
         fillUpSenderOperatorSendFungibleToAddress();
         fillUpSenderOperatorSendFungibleToContract();
         result = executeSafeFullBatchTransferFrom();
-        Assert.isTrue(
-            result,
-            "should pass since parameters with 8 cases are valid"
-        );
+        Assert.isTrue(result, "should pass since parameters with 8 cases are valid");
         /**
             balance assertion of sender as from and sender as operator
          */

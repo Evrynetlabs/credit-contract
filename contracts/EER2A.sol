@@ -1,9 +1,10 @@
 pragma solidity ^0.5.0;
 
 import "./IEER2A.sol";
-import "./SafeMath.sol";
-import "./Address.sol";
 import "./IEER2TokenReceiver.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
+
 
 contract EER2A is IEER2A {
     using SafeMath for uint256;
@@ -39,31 +40,29 @@ contract EER2A is IEER2A {
     function isNonFungible(uint256 _typeID) public pure returns (bool) {
         return _typeID & TYPE_NF_BIT == TYPE_NF_BIT;
     }
+
     function isFungible(uint256 _typeID) public pure returns (bool) {
         return _typeID & TYPE_NF_BIT == 0;
     }
-    function getNonFungibleIndex(uint256 _itemID)
-        public
-        pure
-        returns (uint256)
-    {
+
+    function getNonFungibleIndex(uint256 _itemID) public pure returns (uint256) {
         return _itemID & NF_INDEX_MASK;
     }
-    function getNonFungibleBaseType(uint256 _itemID)
-        public
-        pure
-        returns (uint256)
-    {
+
+    function getNonFungibleBaseType(uint256 _itemID) public pure returns (uint256) {
         return _itemID & TYPE_MASK;
     }
+
     function isNonFungibleBaseType(uint256 _typeID) public pure returns (bool) {
         // A base type has the NF bit but does not have an index.
         return isNonFungible(_typeID) && getNonFungibleIndex(_typeID) == 0;
     }
+
     function isNonFungibleItem(uint256 itemID) public pure returns (bool) {
         // A base type has the NF bit but does has an index.
         return isNonFungible(itemID) && (itemID & NF_INDEX_MASK != 0);
     }
+
     function ownerOf(uint256 _itemID) public view returns (address) {
         return nfOwners[_itemID];
     }
@@ -80,11 +79,7 @@ contract EER2A is IEER2A {
         @param _typeID ID of the Token
         @return        The _owner's balance of the Token type requested
      */
-    function balanceOf(address _owner, uint256 _typeID)
-        public
-        view
-        returns (uint256)
-    {
+    function balanceOf(address _owner, uint256 _typeID) public view returns (uint256) {
         if (isNonFungibleItem(_typeID)) {
             return nfOwners[_typeID] == _owner ? 1 : 0;
         }
@@ -102,14 +97,12 @@ contract EER2A is IEER2A {
         @param _typeIDs ID of the Tokens
         @return        The _owner's balance of the Token types requested (i.e. balance for each (owner, typeID) pair)
      */
-    function balanceOfBatch(
-        address[] calldata _owners,
-        uint256[] calldata _typeIDs
-    ) external view returns (uint256[] memory) {
-        require(
-            _owners.length == _typeIDs.length,
-            "Credit: Array length must match"
-        );
+    function balanceOfBatch(address[] calldata _owners, uint256[] calldata _typeIDs)
+        external
+        view
+        returns (uint256[] memory)
+    {
+        require(_owners.length == _typeIDs.length, "Credit: Array length must match");
 
         uint256[] memory _balances = new uint256[](_owners.length);
         for (uint256 i = 0; i < _owners.length; ++i) {
@@ -135,11 +128,7 @@ contract EER2A is IEER2A {
         @param _operator  Address of authorized operator
         @return           True if the operator is approved, false if not
     */
-    function isApprovedForAll(address _owner, address _operator)
-        external
-        view
-        returns (bool)
-    {
+    function isApprovedForAll(address _owner, address _operator) external view returns (bool) {
         return operatorApproval[_owner][_operator];
     }
 
@@ -189,16 +178,8 @@ contract EER2A is IEER2A {
         // Now that the balance is updated and the event was emitted,
         // call onEER2Received if the destination is a contract.
         if (_to.isContract()) {
-            _doSafeTransferAcceptanceCheck(
-                msg.sender,
-                _from,
-                _to,
-                _typeID,
-                _value,
-                _data
-            );
+            _doSafeTransferAcceptanceCheck(msg.sender, _from, _to, _typeID, _value, _data);
         }
-
     }
 
     /**
@@ -251,14 +232,7 @@ contract EER2A is IEER2A {
         emit TransferBatch(msg.sender, _from, _to, _typeIDs, _values);
 
         if (_to.isContract()) {
-            _doSafeBatchTransferAcceptanceCheck(
-                msg.sender,
-                _from,
-                _to,
-                _typeIDs,
-                _values,
-                _data
-            );
+            _doSafeBatchTransferAcceptanceCheck(msg.sender, _from, _to, _typeIDs, _values, _data);
         }
     }
 
@@ -301,8 +275,7 @@ contract EER2A is IEER2A {
 
             require(to != address(0x0), "Credit: cannot send to zero address");
             require(
-                from == msg.sender ||
-                    operatorApproval[from][msg.sender] == true,
+                from == msg.sender || operatorApproval[from][msg.sender] == true,
                 "Credit: Need operator approval for 3rd party transfers."
             );
             if (isNonFungible(typeID)) {
@@ -316,25 +289,11 @@ contract EER2A is IEER2A {
                 balances[typeID][to] = value.add(balances[typeID][to]);
             }
             if (to.isContract()) {
-                _doSafeTransferAcceptanceCheck(
-                    msg.sender,
-                    from,
-                    to,
-                    typeID,
-                    value,
-                    _data
-                );
+                _doSafeTransferAcceptanceCheck(msg.sender, from, to, typeID, value, _data);
             }
         }
 
-        emit TransferFullBatch(
-            msg.sender,
-            _froms,
-            _tos,
-            _typeIDs,
-            _values,
-            _data
-        );
+        emit TransferFullBatch(msg.sender, _froms, _tos, _typeIDs, _values, _data);
     }
 
     /////////////////////////////////////////// Internal //////////////////////////////////////////////
@@ -353,13 +312,7 @@ contract EER2A is IEER2A {
         // Note: if the below reverts in the onEER2Received function of the _to address you will have an undefined revert reason returned rather than the one in the require test.
         // If you want predictable revert reasons consider using low level _to.call() style instead so the revert does not bubble up and you can revert yourself on the EER2_ACCEPTED test.
         require(
-            IEER2TokenReceiver(_to).onEER2Received(
-                _operator,
-                _from,
-                _typeID,
-                _value,
-                _data
-            ) ==
+            IEER2TokenReceiver(_to).onEER2Received(_operator, _from, _typeID, _value, _data) ==
                 EER2_ACCEPTED,
             "contract returned an unknown value from onEER2Received"
         );

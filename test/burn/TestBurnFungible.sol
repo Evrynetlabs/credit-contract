@@ -5,6 +5,7 @@ import "truffle/DeployedAddresses.sol";
 import "../../contracts/EER2B.sol";
 import "../utils/PayableThrowProxy.sol";
 
+
 contract TestBurnFungible {
     EER2B private credit;
     string private uri;
@@ -37,10 +38,7 @@ contract TestBurnFungible {
 
         proxyCredit.burnFungible(typeID, testAccounts[0], 1);
         (result, ) = throwProxy.execute();
-        Assert.isFalse(
-            result,
-            "should not pass since type of credit is non fungible"
-        );
+        Assert.isFalse(result, "should not pass since type of credit is non fungible");
     }
 
     function testWhenCallerHasNoPermission() external {
@@ -76,10 +74,6 @@ contract TestBurnFungible {
     function testWhenInsufficientCredit() external {
         proxyCredit.burnFungible(typeID, testAccounts[0], 1);
         (result, ) = throwProxy.execute();
-        Assert.isFalse(
-            result,
-            "should not pass since credit quantity is less than 1"
-        );
+        Assert.isFalse(result, "should not pass since credit quantity is less than 1");
     }
-
 }

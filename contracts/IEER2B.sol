@@ -1,5 +1,6 @@
 pragma solidity ^0.5.0;
 
+
 interface IEER2B {
     /**
         @dev The URI must point either an address of the Metadata contract or a JSON file 
@@ -36,9 +37,7 @@ interface IEER2B {
         @param _isNF specific type which want to create
         @return The type id of credit type
      */
-    function create(string calldata _metaLink, bool _isNF)
-        external
-        returns (uint256 _type);
+    function create(string calldata _metaLink, bool _isNF) external returns (uint256 _type);
 
     /**
         @notice Add item of the non-fungible credit.
@@ -54,11 +53,8 @@ interface IEER2B {
         @param _tos Destination addresses
         @param _values Mint credit quantities
      */
-    function mintFungible(
-        uint256 _typeID,
-        address[] calldata _tos,
-        uint256[] calldata _values
-    ) external;
+    function mintFungible(uint256 _typeID, address[] calldata _tos, uint256[] calldata _values)
+        external;
 
     /**
         @notice Delete a non-fungible credit with the corresponding `_itemID` 
@@ -82,6 +78,5 @@ interface IEER2B {
         @param _value Burn Credit quantities
         @param _from Source address
     */
-    function burnFungible(uint256 _typeID, address _from, uint256 _value)
-        external;
+    function burnFungible(uint256 _typeID, address _from, uint256 _value) external;
 }

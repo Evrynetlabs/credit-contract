@@ -1,9 +1,9 @@
 pragma solidity ^0.5.0;
 
 import "./IEER2A.sol";
-import "./SafeMath.sol";
-import "./Address.sol";
 import "./IEER2TokenReceiver.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
 
 contract EER2A is IEER2A {
     using SafeMath for uint256;
@@ -39,31 +39,37 @@ contract EER2A is IEER2A {
     function isNonFungible(uint256 _typeID) public pure returns (bool) {
         return _typeID & TYPE_NF_BIT == TYPE_NF_BIT;
     }
+
     function isFungible(uint256 _typeID) public pure returns (bool) {
         return _typeID & TYPE_NF_BIT == 0;
     }
+
     function getNonFungibleIndex(uint256 _itemID)
-        public
-        pure
-        returns (uint256)
+    public
+    pure
+    returns (uint256)
     {
         return _itemID & NF_INDEX_MASK;
     }
+
     function getNonFungibleBaseType(uint256 _itemID)
-        public
-        pure
-        returns (uint256)
+    public
+    pure
+    returns (uint256)
     {
         return _itemID & TYPE_MASK;
     }
+
     function isNonFungibleBaseType(uint256 _typeID) public pure returns (bool) {
         // A base type has the NF bit but does not have an index.
         return isNonFungible(_typeID) && getNonFungibleIndex(_typeID) == 0;
     }
+
     function isNonFungibleItem(uint256 itemID) public pure returns (bool) {
         // A base type has the NF bit but does has an index.
         return isNonFungible(itemID) && (itemID & NF_INDEX_MASK != 0);
     }
+
     function ownerOf(uint256 _itemID) public view returns (address) {
         return nfOwners[_itemID];
     }
@@ -81,9 +87,9 @@ contract EER2A is IEER2A {
         @return        The _owner's balance of the Token type requested
      */
     function balanceOf(address _owner, uint256 _typeID)
-        public
-        view
-        returns (uint256)
+    public
+    view
+    returns (uint256)
     {
         if (isNonFungibleItem(_typeID)) {
             return nfOwners[_typeID] == _owner ? 1 : 0;
@@ -136,9 +142,9 @@ contract EER2A is IEER2A {
         @return           True if the operator is approved, false if not
     */
     function isApprovedForAll(address _owner, address _operator)
-        external
-        view
-        returns (bool)
+    external
+    view
+    returns (bool)
     {
         return operatorApproval[_owner][_operator];
     }
@@ -287,8 +293,8 @@ contract EER2A is IEER2A {
     ) external {
         require(
             _froms.length == _tos.length &&
-                _froms.length == _typeIDs.length &&
-                _froms.length == _values.length,
+            _froms.length == _typeIDs.length &&
+            _froms.length == _values.length,
             "Credit: Array length must match"
         );
 
@@ -302,7 +308,7 @@ contract EER2A is IEER2A {
             require(to != address(0x0), "Credit: cannot send to zero address");
             require(
                 from == msg.sender ||
-                    operatorApproval[from][msg.sender] == true,
+                operatorApproval[from][msg.sender] == true,
                 "Credit: Need operator approval for 3rd party transfers."
             );
             if (isNonFungible(typeID)) {
@@ -360,7 +366,7 @@ contract EER2A is IEER2A {
                 _value,
                 _data
             ) ==
-                EER2_ACCEPTED,
+            EER2_ACCEPTED,
             "contract returned an unknown value from onEER2Received"
         );
     }
@@ -386,7 +392,7 @@ contract EER2A is IEER2A {
                 _values,
                 _data
             ) ==
-                EER2_BATCH_ACCEPTED,
+            EER2_BATCH_ACCEPTED,
             "contract returned an unknown value from onEER2BatchReceived"
         );
     }

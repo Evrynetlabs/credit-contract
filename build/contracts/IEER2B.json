@@ -1,0 +1,1980 @@
+{
+  "contractName": "IEER2B",
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "_value",
+          "type": "string"
+        },
+        {
+          "indexed": true,
+          "name": "_typeID",
+          "type": "uint256"
+        }
+      ],
+      "name": "URI",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "_typeID",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "name": "_minter",
+          "type": "address"
+        }
+      ],
+      "name": "SetMinter",
+      "type": "event"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_typeID",
+          "type": "uint256"
+        },
+        {
+          "name": "_to",
+          "type": "address"
+        }
+      ],
+      "name": "setMinter",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "_typeID",
+          "type": "uint256"
+        }
+      ],
+      "name": "totalSupply",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_metaLink",
+          "type": "string"
+        },
+        {
+          "name": "_isNF",
+          "type": "bool"
+        }
+      ],
+      "name": "create",
+      "outputs": [
+        {
+          "name": "_type",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_typeID",
+          "type": "uint256"
+        },
+        {
+          "name": "_tos",
+          "type": "address[]"
+        }
+      ],
+      "name": "mintNonFungible",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_typeID",
+          "type": "uint256"
+        },
+        {
+          "name": "_tos",
+          "type": "address[]"
+        },
+        {
+          "name": "_values",
+          "type": "uint256[]"
+        }
+      ],
+      "name": "mintFungible",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_itemID",
+          "type": "uint256"
+        },
+        {
+          "name": "_from",
+          "type": "address"
+        }
+      ],
+      "name": "burnNonFungible",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_typeID",
+          "type": "uint256"
+        },
+        {
+          "name": "_from",
+          "type": "address"
+        },
+        {
+          "name": "_value",
+          "type": "uint256"
+        }
+      ],
+      "name": "burnFungible",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "metadata": "",
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "pragma solidity ^0.5.0;\n\n\ninterface IEER2B {\n    /**\n        @dev The URI must point either an address of the Metadata contract or a JSON file \n        that conforms to the \"EER-2 Metadata URI JSON Schema\"\n        @param _value The string of the URI being updated for a token.\n        @param _typeID The ID of token being updated.\n    */\n    event URI(string _value, uint256 indexed _typeID);\n\n    /**\n        @dev MUST emit when creator authorized to `_minter`. \n        @param _typeID The ID of token being updated.\n        @param _minter The address which will be authorized\n     */\n    event SetMinter(uint256 indexed _typeID, address _minter);\n\n    /**\n        @notice Authorize `_to` address to act the minter of the `_typeID` credit type\n        @param _typeID  Credit type\n        @param _to New minter, in case of address 0 the authorized will be locked forever\n    */\n    function setMinter(uint256 _typeID, address _to) external;\n\n    /**\n        @notice Get the total supply of a Credit.\n        @param _typeID     ID of the Credit\n        @return        The total supply of the Token type requested\n     */\n    function totalSupply(uint256 _typeID) external view returns (uint256);\n\n    /**\n        @notice Create credit type fungible or non-fungible\n        @param _metaLink contract address of metalink which keep information about credit type\n        @param _isNF specific type which want to create\n        @return The type id of credit type\n     */\n    function create(string calldata _metaLink, bool _isNF) external returns (uint256 _type);\n\n    /**\n        @notice Add item of the non-fungible credit.\n        @param _typeID Credit type\n        @param _tos Destination addresses\n     */\n    function mintNonFungible(uint256 _typeID, address[] calldata _tos) external;\n\n    /**\n        @notice Add value of the fungible credit.\n        @dev Caller MUST has a minter role to mint the token\n        @param _typeID Credit type\n        @param _tos Destination addresses\n        @param _values Mint credit quantities\n     */\n    function mintFungible(uint256 _typeID, address[] calldata _tos, uint256[] calldata _values)\n        external;\n\n    /**\n        @notice Delete a non-fungible credit with the corresponding `_itemID` \n        @dev Caller MUST be approved to manage the tokens being deleting out of the `_from` account.\n        MUST revert if `_from` account does not own the item with the `_itemID` sent.\n        MUST revert on any other error.\n        MUST emit TransferSingle event.\n        @param _itemID  Item of non-fungible credit type\n        @param _from Source address\n    */\n    function burnNonFungible(uint256 _itemID, address _from) external;\n\n    /**\n        @notice Delete the `_value` amount of fungible credit with the corresponding `_typeID` from the `_from` account \n        @dev Caller MUST be approved to manage the tokens being deleting out of the `_from` account.\n        MUST revert if the `_typeID` does not represent a fungible credit type.\n        MUST revert if balance of holder for token `_typeID` is lower than the `_value` sent.\n        MUST revert on any other error.\n        MUST emit TransferSingle event.\n        @param _typeID  Credit type\n        @param _value Burn Credit quantities\n        @param _from Source address\n    */\n    function burnFungible(uint256 _typeID, address _from, uint256 _value) external;\n}\n",
+  "sourcePath": "/Users/100x/Evrynetlabs/credit-contract/contracts/IEER2B.sol",
+  "ast": {
+    "absolutePath": "/Users/100x/Evrynetlabs/credit-contract/contracts/IEER2B.sol",
+    "exportedSymbols": {
+      "IEER2B": [
+        1705
+      ]
+    },
+    "id": 1706,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 1634,
+        "literals": [
+          "solidity",
+          "^",
+          "0.5",
+          ".0"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:23:3"
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": null,
+        "fullyImplemented": false,
+        "id": 1705,
+        "linearizedBaseContracts": [
+          1705
+        ],
+        "name": "IEER2B",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "anonymous": false,
+            "documentation": "@dev The URI must point either an address of the Metadata contract or a JSON file \nthat conforms to the \"EER-2 Metadata URI JSON Schema\"\n@param _value The string of the URI being updated for a token.\n@param _typeID The ID of token being updated.",
+            "id": 1640,
+            "name": "URI",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 1639,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1636,
+                  "indexed": false,
+                  "name": "_value",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1640,
+                  "src": "352:13:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 1635,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "352:6:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1638,
+                  "indexed": true,
+                  "name": "_typeID",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1640,
+                  "src": "367:23:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1637,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "367:7:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "351:40:3"
+            },
+            "src": "342:50:3"
+          },
+          {
+            "anonymous": false,
+            "documentation": "@dev MUST emit when creator authorized to `_minter`. \n@param _typeID The ID of token being updated.\n@param _minter The address which will be authorized",
+            "id": 1646,
+            "name": "SetMinter",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 1645,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1642,
+                  "indexed": true,
+                  "name": "_typeID",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1646,
+                  "src": "606:23:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1641,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "606:7:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1644,
+                  "indexed": false,
+                  "name": "_minter",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1646,
+                  "src": "631:15:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 1643,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "631:7:3",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "605:42:3"
+            },
+            "src": "590:58:3"
+          },
+          {
+            "body": null,
+            "documentation": "@notice Authorize `_to` address to act the minter of the `_typeID` credit type\n@param _typeID  Credit type\n@param _to New minter, in case of address 0 the authorized will be locked forever",
+            "id": 1653,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setMinter",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1651,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1648,
+                  "name": "_typeID",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1653,
+                  "src": "901:15:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1647,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "901:7:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1650,
+                  "name": "_to",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1653,
+                  "src": "918:11:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 1649,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "918:7:3",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "900:30:3"
+            },
+            "returnParameters": {
+              "id": 1652,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "939:0:3"
+            },
+            "scope": 1705,
+            "src": "882:58:3",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": "@notice Get the total supply of a Credit.\n@param _typeID     ID of the Credit\n@return        The total supply of the Token type requested",
+            "id": 1660,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "totalSupply",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1656,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1655,
+                  "name": "_typeID",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1660,
+                  "src": "1145:15:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1654,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1145:7:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1144:17:3"
+            },
+            "returnParameters": {
+              "id": 1659,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1658,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1660,
+                  "src": "1185:7:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1657,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1185:7:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1184:9:3"
+            },
+            "scope": 1705,
+            "src": "1124:70:3",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": "@notice Create credit type fungible or non-fungible\n@param _metaLink contract address of metalink which keep information about credit type\n@param _isNF specific type which want to create\n@return The type id of credit type",
+            "id": 1669,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "create",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1665,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1662,
+                  "name": "_metaLink",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1669,
+                  "src": "1486:25:3",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_calldata_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 1661,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1486:6:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1664,
+                  "name": "_isNF",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1669,
+                  "src": "1513:10:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 1663,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1513:4:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1485:39:3"
+            },
+            "returnParameters": {
+              "id": 1668,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1667,
+                  "name": "_type",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1669,
+                  "src": "1543:13:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1666,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1543:7:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1542:15:3"
+            },
+            "scope": 1705,
+            "src": "1470:88:3",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": "@notice Add item of the non-fungible credit.\n@param _typeID Credit type\n@param _tos Destination addresses",
+            "id": 1677,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "mintNonFungible",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1675,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1671,
+                  "name": "_typeID",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1677,
+                  "src": "1735:15:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1670,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1735:7:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1674,
+                  "name": "_tos",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1677,
+                  "src": "1752:23:3",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_address_$dyn_calldata_ptr",
+                    "typeString": "address[]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 1672,
+                      "name": "address",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "1752:7:3",
+                      "stateMutability": "nonpayable",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address",
+                        "typeString": "address"
+                      }
+                    },
+                    "id": 1673,
+                    "length": null,
+                    "nodeType": "ArrayTypeName",
+                    "src": "1752:9:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_address_$dyn_storage_ptr",
+                      "typeString": "address[]"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1734:42:3"
+            },
+            "returnParameters": {
+              "id": 1676,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1785:0:3"
+            },
+            "scope": 1705,
+            "src": "1710:76:3",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": "@notice Add value of the fungible credit.\n@dev Caller MUST has a minter role to mint the token\n@param _typeID Credit type\n@param _tos Destination addresses\n@param _values Mint credit quantities",
+            "id": 1688,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "mintFungible",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1686,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1679,
+                  "name": "_typeID",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1688,
+                  "src": "2064:15:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1678,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2064:7:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1682,
+                  "name": "_tos",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1688,
+                  "src": "2081:23:3",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_address_$dyn_calldata_ptr",
+                    "typeString": "address[]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 1680,
+                      "name": "address",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "2081:7:3",
+                      "stateMutability": "nonpayable",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address",
+                        "typeString": "address"
+                      }
+                    },
+                    "id": 1681,
+                    "length": null,
+                    "nodeType": "ArrayTypeName",
+                    "src": "2081:9:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_address_$dyn_storage_ptr",
+                      "typeString": "address[]"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1685,
+                  "name": "_values",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1688,
+                  "src": "2106:26:3",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_uint256_$dyn_calldata_ptr",
+                    "typeString": "uint256[]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 1683,
+                      "name": "uint256",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "2106:7:3",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "id": 1684,
+                    "length": null,
+                    "nodeType": "ArrayTypeName",
+                    "src": "2106:9:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_uint256_$dyn_storage_ptr",
+                      "typeString": "uint256[]"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2063:70:3"
+            },
+            "returnParameters": {
+              "id": 1687,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2150:0:3"
+            },
+            "scope": 1705,
+            "src": "2042:109:3",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": "@notice Delete a non-fungible credit with the corresponding `_itemID` \n@dev Caller MUST be approved to manage the tokens being deleting out of the `_from` account.\nMUST revert if `_from` account does not own the item with the `_itemID` sent.\nMUST revert on any other error.\nMUST emit TransferSingle event.\n@param _itemID  Item of non-fungible credit type\n@param _from Source address",
+            "id": 1695,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "burnNonFungible",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1693,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1690,
+                  "name": "_itemID",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1695,
+                  "src": "2636:15:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1689,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2636:7:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1692,
+                  "name": "_from",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1695,
+                  "src": "2653:13:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 1691,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2653:7:3",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2635:32:3"
+            },
+            "returnParameters": {
+              "id": 1694,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2676:0:3"
+            },
+            "scope": 1705,
+            "src": "2611:66:3",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": "@notice Delete the `_value` amount of fungible credit with the corresponding `_typeID` from the `_from` account \n@dev Caller MUST be approved to manage the tokens being deleting out of the `_from` account.\nMUST revert if the `_typeID` does not represent a fungible credit type.\nMUST revert if balance of holder for token `_typeID` is lower than the `_value` sent.\nMUST revert on any other error.\nMUST emit TransferSingle event.\n@param _typeID  Credit type\n@param _value Burn Credit quantities\n@param _from Source address",
+            "id": 1704,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "burnFungible",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1702,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1697,
+                  "name": "_typeID",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1704,
+                  "src": "3313:15:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1696,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3313:7:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1699,
+                  "name": "_from",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1704,
+                  "src": "3330:13:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 1698,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3330:7:3",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1701,
+                  "name": "_value",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1704,
+                  "src": "3345:14:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1700,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3345:7:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3312:48:3"
+            },
+            "returnParameters": {
+              "id": 1703,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "3369:0:3"
+            },
+            "scope": 1705,
+            "src": "3291:79:3",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "external"
+          }
+        ],
+        "scope": 1706,
+        "src": "26:3346:3"
+      }
+    ],
+    "src": "0:3373:3"
+  },
+  "legacyAST": {
+    "absolutePath": "/Users/100x/Evrynetlabs/credit-contract/contracts/IEER2B.sol",
+    "exportedSymbols": {
+      "IEER2B": [
+        1705
+      ]
+    },
+    "id": 1706,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 1634,
+        "literals": [
+          "solidity",
+          "^",
+          "0.5",
+          ".0"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:23:3"
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": null,
+        "fullyImplemented": false,
+        "id": 1705,
+        "linearizedBaseContracts": [
+          1705
+        ],
+        "name": "IEER2B",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "anonymous": false,
+            "documentation": "@dev The URI must point either an address of the Metadata contract or a JSON file \nthat conforms to the \"EER-2 Metadata URI JSON Schema\"\n@param _value The string of the URI being updated for a token.\n@param _typeID The ID of token being updated.",
+            "id": 1640,
+            "name": "URI",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 1639,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1636,
+                  "indexed": false,
+                  "name": "_value",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1640,
+                  "src": "352:13:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 1635,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "352:6:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1638,
+                  "indexed": true,
+                  "name": "_typeID",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1640,
+                  "src": "367:23:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1637,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "367:7:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "351:40:3"
+            },
+            "src": "342:50:3"
+          },
+          {
+            "anonymous": false,
+            "documentation": "@dev MUST emit when creator authorized to `_minter`. \n@param _typeID The ID of token being updated.\n@param _minter The address which will be authorized",
+            "id": 1646,
+            "name": "SetMinter",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 1645,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1642,
+                  "indexed": true,
+                  "name": "_typeID",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1646,
+                  "src": "606:23:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1641,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "606:7:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1644,
+                  "indexed": false,
+                  "name": "_minter",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1646,
+                  "src": "631:15:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 1643,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "631:7:3",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "605:42:3"
+            },
+            "src": "590:58:3"
+          },
+          {
+            "body": null,
+            "documentation": "@notice Authorize `_to` address to act the minter of the `_typeID` credit type\n@param _typeID  Credit type\n@param _to New minter, in case of address 0 the authorized will be locked forever",
+            "id": 1653,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setMinter",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1651,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1648,
+                  "name": "_typeID",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1653,
+                  "src": "901:15:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1647,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "901:7:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1650,
+                  "name": "_to",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1653,
+                  "src": "918:11:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 1649,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "918:7:3",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "900:30:3"
+            },
+            "returnParameters": {
+              "id": 1652,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "939:0:3"
+            },
+            "scope": 1705,
+            "src": "882:58:3",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": "@notice Get the total supply of a Credit.\n@param _typeID     ID of the Credit\n@return        The total supply of the Token type requested",
+            "id": 1660,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "totalSupply",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1656,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1655,
+                  "name": "_typeID",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1660,
+                  "src": "1145:15:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1654,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1145:7:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1144:17:3"
+            },
+            "returnParameters": {
+              "id": 1659,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1658,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1660,
+                  "src": "1185:7:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1657,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1185:7:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1184:9:3"
+            },
+            "scope": 1705,
+            "src": "1124:70:3",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": "@notice Create credit type fungible or non-fungible\n@param _metaLink contract address of metalink which keep information about credit type\n@param _isNF specific type which want to create\n@return The type id of credit type",
+            "id": 1669,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "create",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1665,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1662,
+                  "name": "_metaLink",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1669,
+                  "src": "1486:25:3",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_calldata_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 1661,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1486:6:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1664,
+                  "name": "_isNF",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1669,
+                  "src": "1513:10:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 1663,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1513:4:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1485:39:3"
+            },
+            "returnParameters": {
+              "id": 1668,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1667,
+                  "name": "_type",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1669,
+                  "src": "1543:13:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1666,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1543:7:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1542:15:3"
+            },
+            "scope": 1705,
+            "src": "1470:88:3",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": "@notice Add item of the non-fungible credit.\n@param _typeID Credit type\n@param _tos Destination addresses",
+            "id": 1677,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "mintNonFungible",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1675,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1671,
+                  "name": "_typeID",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1677,
+                  "src": "1735:15:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1670,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1735:7:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1674,
+                  "name": "_tos",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1677,
+                  "src": "1752:23:3",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_address_$dyn_calldata_ptr",
+                    "typeString": "address[]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 1672,
+                      "name": "address",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "1752:7:3",
+                      "stateMutability": "nonpayable",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address",
+                        "typeString": "address"
+                      }
+                    },
+                    "id": 1673,
+                    "length": null,
+                    "nodeType": "ArrayTypeName",
+                    "src": "1752:9:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_address_$dyn_storage_ptr",
+                      "typeString": "address[]"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1734:42:3"
+            },
+            "returnParameters": {
+              "id": 1676,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1785:0:3"
+            },
+            "scope": 1705,
+            "src": "1710:76:3",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": "@notice Add value of the fungible credit.\n@dev Caller MUST has a minter role to mint the token\n@param _typeID Credit type\n@param _tos Destination addresses\n@param _values Mint credit quantities",
+            "id": 1688,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "mintFungible",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1686,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1679,
+                  "name": "_typeID",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1688,
+                  "src": "2064:15:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1678,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2064:7:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1682,
+                  "name": "_tos",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1688,
+                  "src": "2081:23:3",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_address_$dyn_calldata_ptr",
+                    "typeString": "address[]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 1680,
+                      "name": "address",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "2081:7:3",
+                      "stateMutability": "nonpayable",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address",
+                        "typeString": "address"
+                      }
+                    },
+                    "id": 1681,
+                    "length": null,
+                    "nodeType": "ArrayTypeName",
+                    "src": "2081:9:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_address_$dyn_storage_ptr",
+                      "typeString": "address[]"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1685,
+                  "name": "_values",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1688,
+                  "src": "2106:26:3",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_uint256_$dyn_calldata_ptr",
+                    "typeString": "uint256[]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 1683,
+                      "name": "uint256",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "2106:7:3",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "id": 1684,
+                    "length": null,
+                    "nodeType": "ArrayTypeName",
+                    "src": "2106:9:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_uint256_$dyn_storage_ptr",
+                      "typeString": "uint256[]"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2063:70:3"
+            },
+            "returnParameters": {
+              "id": 1687,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2150:0:3"
+            },
+            "scope": 1705,
+            "src": "2042:109:3",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": "@notice Delete a non-fungible credit with the corresponding `_itemID` \n@dev Caller MUST be approved to manage the tokens being deleting out of the `_from` account.\nMUST revert if `_from` account does not own the item with the `_itemID` sent.\nMUST revert on any other error.\nMUST emit TransferSingle event.\n@param _itemID  Item of non-fungible credit type\n@param _from Source address",
+            "id": 1695,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "burnNonFungible",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1693,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1690,
+                  "name": "_itemID",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1695,
+                  "src": "2636:15:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1689,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2636:7:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1692,
+                  "name": "_from",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1695,
+                  "src": "2653:13:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 1691,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2653:7:3",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2635:32:3"
+            },
+            "returnParameters": {
+              "id": 1694,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2676:0:3"
+            },
+            "scope": 1705,
+            "src": "2611:66:3",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": "@notice Delete the `_value` amount of fungible credit with the corresponding `_typeID` from the `_from` account \n@dev Caller MUST be approved to manage the tokens being deleting out of the `_from` account.\nMUST revert if the `_typeID` does not represent a fungible credit type.\nMUST revert if balance of holder for token `_typeID` is lower than the `_value` sent.\nMUST revert on any other error.\nMUST emit TransferSingle event.\n@param _typeID  Credit type\n@param _value Burn Credit quantities\n@param _from Source address",
+            "id": 1704,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "burnFungible",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1702,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1697,
+                  "name": "_typeID",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1704,
+                  "src": "3313:15:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1696,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3313:7:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1699,
+                  "name": "_from",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1704,
+                  "src": "3330:13:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 1698,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3330:7:3",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1701,
+                  "name": "_value",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1704,
+                  "src": "3345:14:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1700,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3345:7:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3312:48:3"
+            },
+            "returnParameters": {
+              "id": 1703,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "3369:0:3"
+            },
+            "scope": 1705,
+            "src": "3291:79:3",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "external"
+          }
+        ],
+        "scope": 1706,
+        "src": "26:3346:3"
+      }
+    ],
+    "src": "0:3373:3"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.5.0+commit.1d4f565a.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.0.19",
+  "updatedAt": "2020-04-10T07:15:28.335Z",
+  "devdoc": {
+    "methods": {
+      "burnFungible(uint256,address,uint256)": {
+        "details": "Caller MUST be approved to manage the tokens being deleting out of the `_from` account. MUST revert if the `_typeID` does not represent a fungible credit type. MUST revert if balance of holder for token `_typeID` is lower than the `_value` sent. MUST revert on any other error. MUST emit TransferSingle event.",
+        "params": {
+          "_from": "Source address",
+          "_typeID": "Credit type",
+          "_value": "Burn Credit quantities"
+        }
+      },
+      "burnNonFungible(uint256,address)": {
+        "details": "Caller MUST be approved to manage the tokens being deleting out of the `_from` account. MUST revert if `_from` account does not own the item with the `_itemID` sent. MUST revert on any other error. MUST emit TransferSingle event.",
+        "params": {
+          "_from": "Source address",
+          "_itemID": "Item of non-fungible credit type"
+        }
+      },
+      "create(string,bool)": {
+        "params": {
+          "_isNF": "specific type which want to create",
+          "_metaLink": "contract address of metalink which keep information about credit type"
+        },
+        "return": "The type id of credit type"
+      },
+      "mintFungible(uint256,address[],uint256[])": {
+        "details": "Caller MUST has a minter role to mint the token",
+        "params": {
+          "_tos": "Destination addresses",
+          "_typeID": "Credit type",
+          "_values": "Mint credit quantities"
+        }
+      },
+      "mintNonFungible(uint256,address[])": {
+        "params": {
+          "_tos": "Destination addresses",
+          "_typeID": "Credit type"
+        }
+      },
+      "setMinter(uint256,address)": {
+        "params": {
+          "_to": "New minter, in case of address 0 the authorized will be locked forever",
+          "_typeID": "Credit type"
+        }
+      },
+      "totalSupply(uint256)": {
+        "params": {
+          "_typeID": "ID of the Credit"
+        },
+        "return": "The total supply of the Token type requested"
+      }
+    }
+  },
+  "userdoc": {
+    "methods": {
+      "burnFungible(uint256,address,uint256)": {
+        "notice": "Delete the `_value` amount of fungible credit with the corresponding `_typeID` from the `_from` account "
+      },
+      "burnNonFungible(uint256,address)": {
+        "notice": "Delete a non-fungible credit with the corresponding `_itemID` "
+      },
+      "create(string,bool)": {
+        "notice": "Create credit type fungible or non-fungible"
+      },
+      "mintFungible(uint256,address[],uint256[])": {
+        "notice": "Add value of the fungible credit."
+      },
+      "mintNonFungible(uint256,address[])": {
+        "notice": "Add item of the non-fungible credit."
+      },
+      "setMinter(uint256,address)": {
+        "notice": "Authorize `_to` address to act the minter of the `_typeID` credit type"
+      },
+      "totalSupply(uint256)": {
+        "notice": "Get the total supply of a Credit."
+      }
+    }
+  }
+}

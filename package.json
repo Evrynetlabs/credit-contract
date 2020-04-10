@@ -13,7 +13,7 @@
     "type": "git",
     "url": "https://github.com/Evrynetlabs/credit-contract.git"
   },
-  "license": "MIT",
+  "license": "OSL-3.0",
   "devDependencies": {
     "prettier": "^1.19.1",
     "prettier-plugin-solidity": "^1.0.0-alpha.41",

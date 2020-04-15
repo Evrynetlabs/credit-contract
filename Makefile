@@ -3,7 +3,7 @@
 .PHONY: test-coverage
 
 lint:
-	yarn run lint
+	yarn run solhint
 
 test: 
 	yarn run test

@@ -5,6 +5,7 @@ import "../../utils/ThrowProxy.sol";
 import "../../utils/PayableThrowProxy.sol";
 import "../../../contracts/EER2B.sol";
 
+
 contract TestOwnerTransferFungibleCredit {
     EER2B private credit;
     PayableThrowProxy private fooAccountProxy;
@@ -34,25 +35,15 @@ contract TestOwnerTransferFungibleCredit {
         uint256 fungibleCreditID = prepareFungible();
         address barAccount = address(1);
 
-        uint256 initialFooAccountBalance = credit.balanceOf(
-            fooAccount,
-            fungibleCreditID
-        );
-        uint256 initialBarAccountBalance = credit.balanceOf(
-            barAccount,
-            fungibleCreditID
-        );
+        uint256 initialFooAccountBalance = credit.balanceOf(fooAccount, fungibleCreditID);
+        uint256 initialBarAccountBalance = credit.balanceOf(barAccount, fungibleCreditID);
 
         Assert.equal(
             initialFooAccountBalance,
             initialCreditBalance,
             "account should have an initial balance of credit"
         );
-        Assert.equal(
-            initialBarAccountBalance,
-            0,
-            "account should have no credit balance"
-        );
+        Assert.equal(initialBarAccountBalance, 0, "account should have no credit balance");
 
         EER2B(fooAccount).safeTransferFrom(
             fooAccount,
@@ -62,19 +53,10 @@ contract TestOwnerTransferFungibleCredit {
             bytes("")
         );
         (bool success, ) = fooAccountProxy.execute.gas(200000)();
-        Assert.isTrue(
-            success,
-            "should not throw error transferring fungible credit"
-        );
+        Assert.isTrue(success, "should not throw error transferring fungible credit");
 
-        uint256 remainingFooAccountBalance = credit.balanceOf(
-            fooAccount,
-            fungibleCreditID
-        );
-        uint256 remainingBarAccountBalance = credit.balanceOf(
-            barAccount,
-            fungibleCreditID
-        );
+        uint256 remainingFooAccountBalance = credit.balanceOf(fooAccount, fungibleCreditID);
+        uint256 remainingBarAccountBalance = credit.balanceOf(barAccount, fungibleCreditID);
 
         Assert.equal(
             initialFooAccountBalance - transferringAmount,
@@ -90,30 +72,18 @@ contract TestOwnerTransferFungibleCredit {
 
     function testTransferFungibleCreditToTokenReceivedContract() external {
         uint256 fungibleCreditID = prepareFungible();
-        PayableThrowProxy barAccountProxy = new PayableThrowProxy(
-            address(credit)
-        );
+        PayableThrowProxy barAccountProxy = new PayableThrowProxy(address(credit));
         address barAccount = address(barAccountProxy);
 
-        uint256 initialFooAccountBalance = credit.balanceOf(
-            fooAccount,
-            fungibleCreditID
-        );
-        uint256 initialBarAccountBalance = credit.balanceOf(
-            barAccount,
-            fungibleCreditID
-        );
+        uint256 initialFooAccountBalance = credit.balanceOf(fooAccount, fungibleCreditID);
+        uint256 initialBarAccountBalance = credit.balanceOf(barAccount, fungibleCreditID);
 
         Assert.equal(
             initialFooAccountBalance,
             initialCreditBalance,
             "account should have an initial balance of credit"
         );
-        Assert.equal(
-            initialBarAccountBalance,
-            0,
-            "account should have no credit balance"
-        );
+        Assert.equal(initialBarAccountBalance, 0, "account should have no credit balance");
 
         EER2B(fooAccount).safeTransferFrom(
             fooAccount,
@@ -123,19 +93,10 @@ contract TestOwnerTransferFungibleCredit {
             bytes("")
         );
         (bool success, ) = fooAccountProxy.execute.gas(200000)();
-        Assert.isTrue(
-            success,
-            "should not throw error transferring fungible credit"
-        );
+        Assert.isTrue(success, "should not throw error transferring fungible credit");
 
-        uint256 remainingFooAccountBalance = credit.balanceOf(
-            fooAccount,
-            fungibleCreditID
-        );
-        uint256 remainingBarAccountBalance = credit.balanceOf(
-            barAccount,
-            fungibleCreditID
-        );
+        uint256 remainingFooAccountBalance = credit.balanceOf(fooAccount, fungibleCreditID);
+        uint256 remainingBarAccountBalance = credit.balanceOf(barAccount, fungibleCreditID);
 
         Assert.equal(
             initialFooAccountBalance - transferringAmount,

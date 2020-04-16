@@ -27,7 +27,7 @@
   "scripts": {
     "build": "truffle build",
     "test": "truffle test",
-    "solhint": "./node_modules/.bin/solhint -f table contracts/**/*.sol && ./node_modules/.bin/solhint -f table test/**/*.sol",
-    "prettier:solidity": "./node_modules/.bin/prettier --write contracts/**/*.sol && ./node_modules/.bin/prettier --write test/**/*.sol "
+    "solhint": "./node_modules/.bin/solhint -f table 'contracts/**/*.sol' && ./node_modules/.bin/solhint -f table 'test/**/*.sol'",
+    "prettier:solidity": "./node_modules/.bin/prettier --write 'contracts/**/*.sol' && ./node_modules/.bin/prettier --write 'test/**/*.sol' "
   }
 }

@@ -3,6 +3,7 @@ pragma solidity >=0.4.25 <0.6.0;
 import "truffle/Assert.sol";
 import "./../contracts/EER2B.sol";
 
+
 contract TestTotalSupply {
     EER2B private credit;
     address private fooAccount;

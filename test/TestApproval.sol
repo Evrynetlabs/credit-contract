@@ -4,6 +4,7 @@ import "truffle/Assert.sol";
 import "./utils/ThrowProxy.sol";
 import "../contracts/EER2A.sol";
 
+
 contract TestApproval {
     EER2A private credit;
     ThrowProxy private accountProxy;

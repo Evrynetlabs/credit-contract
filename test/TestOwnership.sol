@@ -4,6 +4,7 @@ import "truffle/Assert.sol";
 import "./utils/ThrowProxy.sol";
 import "../contracts/EER2B.sol";
 
+
 contract EER2BWrapper is EER2B {
     constructor() public EER2B() {}
 
@@ -12,13 +13,10 @@ contract EER2BWrapper is EER2B {
         uint256[] calldata _typeIDs,
         uint256[] calldata _expecteds
     ) external {
-        Assert.equal(
-            this.balanceOfBatch(_owners, _typeIDs),
-            _expecteds,
-            "balances are invalid"
-        );
+        Assert.equal(this.balanceOfBatch(_owners, _typeIDs), _expecteds, "balances are invalid");
     }
 }
+
 
 contract TestOwnership {
     EER2BWrapper private credit;
@@ -96,11 +94,7 @@ contract TestOwnership {
         expecteds[3] = 0;
         expecteds[4] = 0;
 
-        EER2BWrapper(address(throwProxy)).callBalanceOfBatch(
-            owners,
-            typeIDs,
-            expecteds
-        );
+        EER2BWrapper(address(throwProxy)).callBalanceOfBatch(owners, typeIDs, expecteds);
         (bool success, ) = throwProxy.execute.gas(200000)();
         Assert.isTrue(success, "should not throw error");
     }
@@ -117,11 +111,7 @@ contract TestOwnership {
 
         uint256[] memory expecteds = new uint256[](3);
 
-        EER2BWrapper(address(throwProxy)).callBalanceOfBatch(
-            owners,
-            typeIDs,
-            expecteds
-        );
+        EER2BWrapper(address(throwProxy)).callBalanceOfBatch(owners, typeIDs, expecteds);
         (bool success, ) = throwProxy.execute.gas(200000)();
         Assert.isFalse(success, "should throw error");
     }

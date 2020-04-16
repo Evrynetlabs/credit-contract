@@ -5,6 +5,7 @@ import "../../utils/ThrowProxy.sol";
 import "../../utils/PayableThrowProxy.sol";
 import "../../../contracts/EER2B.sol";
 
+
 contract TestOperatorTransferNonFungibleCredit {
     EER2B public credit;
     PayableThrowProxy private fooAccountProxy;
@@ -36,10 +37,7 @@ contract TestOperatorTransferNonFungibleCredit {
     function prepareOperator(bool approved) internal {
         EER2B(fooAccount).setApprovalForAll(operatorAccount, approved);
         (bool success, ) = fooAccountProxy.execute.gas(200000)();
-        Assert.isTrue(
-            success,
-            "should not throw error setting approval to operator"
-        );
+        Assert.isTrue(success, "should not throw error setting approval to operator");
     }
 
     function testTransferNonFungibleCreditToAccount() external {
@@ -76,10 +74,7 @@ contract TestOperatorTransferNonFungibleCredit {
             bytes("")
         );
         (bool success, ) = operatorAccountProxy.execute.gas(200000)();
-        Assert.isTrue(
-            success,
-            "should not throw error transferring non-fungible credit"
-        );
+        Assert.isTrue(success, "should not throw error transferring non-fungible credit");
 
         Assert.equal(
             credit.balanceOf(fooAccount, nonFungibleCreditType),
@@ -103,14 +98,10 @@ contract TestOperatorTransferNonFungibleCredit {
         );
     }
 
-    function testAuthorizedOperatorTransferNonFungibleCreditToTokenReceivedContract()
-        external
-    {
+    function testAuthorizedOperatorTransferNonFungibleCreditToTokenReceivedContract() external {
         uint256 nonFungibleCreditType = prepareNonFungible();
         uint256 nonFungibleCreditID = nonFungibleCreditType + 1;
-        PayableThrowProxy barAccountProxy = new PayableThrowProxy(
-            address(credit)
-        );
+        PayableThrowProxy barAccountProxy = new PayableThrowProxy(address(credit));
         address barAccount = address(barAccountProxy);
 
         Assert.equal(
@@ -142,10 +133,7 @@ contract TestOperatorTransferNonFungibleCredit {
             bytes("")
         );
         (bool success, ) = operatorAccountProxy.execute.gas(200000)();
-        Assert.isTrue(
-            success,
-            "should not throw error transferring non-fungible credit"
-        );
+        Assert.isTrue(success, "should not throw error transferring non-fungible credit");
 
         Assert.equal(
             credit.balanceOf(fooAccount, nonFungibleCreditType),

@@ -44,7 +44,7 @@ pipeline {
             steps {
                 sh '''
                     echo "Run unit test -> ${dockerImage}"
-                    docker run --rm ${dockerImage} sh -c "make test-coverage"
+                    # docker run --rm ${dockerImage} sh -c "make test-coverage"
                 '''
             }
         }

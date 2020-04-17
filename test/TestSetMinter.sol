@@ -5,6 +5,7 @@ import "truffle/DeployedAddresses.sol";
 import "../contracts/EER2B.sol";
 import "./utils/PayableThrowProxy.sol";
 
+
 contract TestSetMinter {
     EER2B private credit;
     string private uri;
@@ -28,10 +29,7 @@ contract TestSetMinter {
         proxyCredit.setMinter(typeID, address(2));
         (result, ) = throwProxy.execute();
 
-        Assert.isFalse(
-            result,
-            "Should not pass since a caller is not a creator of the credit"
-        );
+        Assert.isFalse(result, "Should not pass since a caller is not a creator of the credit");
     }
 
     function testWhenNewMinterIsCurrentMinter() external {

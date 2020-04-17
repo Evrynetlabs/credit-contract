@@ -5,6 +5,7 @@ import "../../utils/ThrowProxy.sol";
 import "../../utils/PayableThrowProxy.sol";
 import "../../../contracts/EER2B.sol";
 
+
 contract TestOwnerTransferNonFungibleCredit {
     EER2B private credit;
     PayableThrowProxy private fooAccountProxy;
@@ -62,10 +63,7 @@ contract TestOwnerTransferNonFungibleCredit {
             bytes("")
         );
         (bool success, ) = fooAccountProxy.execute.gas(200000)();
-        Assert.isTrue(
-            success,
-            "should not throw error transferring non-fungible credit"
-        );
+        Assert.isTrue(success, "should not throw error transferring non-fungible credit");
 
         Assert.equal(
             credit.balanceOf(fooAccount, nonFungibleCreditType),
@@ -92,9 +90,7 @@ contract TestOwnerTransferNonFungibleCredit {
     function testTransferNonFungibleCreditToTokenReceivedContract() external {
         uint256 nonFungibleCreditType = prepareNonFungible();
         uint256 nonFungibleCreditID = nonFungibleCreditType + 1;
-        PayableThrowProxy barAccountProxy = new PayableThrowProxy(
-            address(credit)
-        );
+        PayableThrowProxy barAccountProxy = new PayableThrowProxy(address(credit));
         address barAccount = address(barAccountProxy);
 
         Assert.equal(
@@ -126,10 +122,7 @@ contract TestOwnerTransferNonFungibleCredit {
             bytes("")
         );
         (bool success, ) = fooAccountProxy.execute.gas(200000)();
-        Assert.isTrue(
-            success,
-            "should not throw error transferring non-fungible credit"
-        );
+        Assert.isTrue(success, "should not throw error transferring non-fungible credit");
 
         Assert.equal(
             credit.balanceOf(fooAccount, nonFungibleCreditType),

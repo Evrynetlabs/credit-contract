@@ -4,6 +4,7 @@ import "truffle/Assert.sol";
 import "truffle/DeployedAddresses.sol";
 import "../contracts/EER2B.sol";
 
+
 contract TestCreateCredit {
     EER2B private credit;
 
@@ -16,10 +17,7 @@ contract TestCreateCredit {
         bool isNF = false;
         uint256 expectedID = 1 << 128;
         uint256 actualID = credit.create(expectedURI, isNF);
-        Assert.isTrue(
-            credit.isFungible(expectedID),
-            "credit type should be non-fundgible"
-        );
+        Assert.isTrue(credit.isFungible(expectedID), "credit type should be non-fundgible");
         Assert.equal(
             actualID,
             expectedID,
@@ -42,10 +40,7 @@ contract TestCreateCredit {
         bool isNF = true;
         uint256 expectedID = (1 << 128) | (1 << 255);
         uint256 actualID = credit.create(expectedURI, isNF);
-        Assert.isTrue(
-            credit.isNonFungible(expectedID),
-            "credit type should be non-fundgible"
-        );
+        Assert.isTrue(credit.isNonFungible(expectedID), "credit type should be non-fundgible");
         Assert.equal(
             actualID,
             expectedID,

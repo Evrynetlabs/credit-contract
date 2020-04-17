@@ -16,5 +16,6 @@ COPY package.json ./
 COPY yarn.lock ./
 
 RUN yarn install
+RUN npm install -g npm-cli-login
 
 COPY . .

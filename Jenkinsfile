@@ -64,6 +64,23 @@ pipeline {
                 '''
             }
         }
+
+        stage('Publish') {
+            when {
+                branch 'master'
+            }
+            steps {
+                withCredentials([
+                    usernamePassword(credentialsId: 'evry-npm-account', usernameVariable: 'NPM_USER', passwordVariable: 'NPM_PASS'),
+                    string(credentialsId: 'evrynetlabs-npm-email', variable: 'NPM_EMAIL')
+                    ]) {
+                    sh '''
+                        echo "Publish to npm"
+                        docker run --rm ${dockerImage} sh -c "npm-cli-login -u $NPM_USER -p $NPM_PASS -e $NPM_EMAIL && npm publish"
+                    '''
+                }
+            }
+        }
     }
     post {
         failure {
